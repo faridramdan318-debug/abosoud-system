@@ -3,73 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام إدارة المؤسسة والزيوت المتكامل - Enterprise ERP</title>
+  <title>نظام إدارة المؤسسة والزيوت - أبو السعود علام</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   
   <style>
     :root {
-      --bg-primary: #0f172a;
-      --bg-secondary: #1e293b;
-      --bg-card: #334155;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent-color: #2563eb;
-      --accent-hover: #1d4ed8;
-      --success-color: #10b981;
-      --warning-color: #f59e0b;
-      --danger-color: #ef4444;
-      --border-color: #475569;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --bg-card: #f0f0f0;
+      --text-main: #1a1a2e;
+      --text-muted: #6c757d;
+      --accent-color: #c9a84c;
+      --accent-hover: #b8963a;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --border-color: #dee2e6;
       --sidebar-width: 260px;
+      --gold-gradient: linear-gradient(135deg, #f5e7b0, #c9a84c);
+      --header-bg: linear-gradient(135deg, #1a1a2e, #16213e);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: var(--bg-primary); color: var(--text-main); direction: rtl; display: flex; height: 100vh; overflow: hidden; }
 
-    .auth-container { position: fixed; inset: 0; background-color: var(--bg-primary); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-    .auth-card { background-color: var(--bg-secondary); padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 420px; border: 1px solid var(--border-color); }
-    .auth-card h2 { text-align: center; margin-bottom: 1.5rem; color: var(--accent-color); }
+    .auth-container { position: fixed; inset: 0; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+    .auth-card { background-color: #ffffff; padding: 2.5rem; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); width: 100%; max-width: 420px; border: 2px solid var(--accent-color); }
+    .auth-card h2 { text-align: center; margin-bottom: 1.5rem; color: var(--accent-color); font-size: 1.8rem; font-weight: 700; }
+    .auth-card h2 span { display: block; font-size: 1rem; color: var(--text-muted); font-weight: 400; }
 
-    #sidebar { width: var(--sidebar-width); background-color: var(--bg-secondary); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; }
-    .sidebar-header { padding: 1.2rem; font-size: 1.1rem; font-weight: bold; color: var(--accent-color); border-bottom: 1px solid var(--border-color); text-align: center; }
-    .sidebar-nav { list-style: none; overflow-y: auto; flex: 1; }
-    .sidebar-nav li a { display: flex; align-items: center; padding: 0.8rem 1.2rem; color: var(--text-muted); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.03); transition: all 0.2s; cursor: pointer; font-size: 0.9rem; }
-    .sidebar-nav li a:hover, .sidebar-nav li a.active { background-color: var(--accent-color); color: #fff; }
+    #sidebar { width: var(--sidebar-width); background: linear-gradient(180deg, #1a1a2e, #16213e); border-left: 1px solid var(--accent-color); display: flex; flex-direction: column; }
+    .sidebar-header { 
+      padding: 1.5rem 1.2rem; 
+      font-size: 1.3rem; 
+      font-weight: bold; 
+      background: var(--gold-gradient);
+      color: #1a1a2e;
+      border-bottom: 2px solid var(--accent-color);
+      text-align: center;
+      border-radius: 0 0 20px 20px;
+      box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3);
+    }
+    .sidebar-header small { display: block; font-size: 0.7rem; font-weight: 400; opacity: 0.8; }
+    .sidebar-nav { list-style: none; overflow-y: auto; flex: 1; padding-top: 10px; }
+    .sidebar-nav li a { 
+      display: flex; 
+      align-items: center; 
+      padding: 0.8rem 1.2rem; 
+      color: #b0b0c8; 
+      text-decoration: none; 
+      border-bottom: 1px solid rgba(255,255,255,0.05); 
+      transition: all 0.3s; 
+      cursor: pointer; 
+      font-size: 0.9rem; 
+      border-radius: 8px;
+      margin: 2px 8px;
+    }
+    .sidebar-nav li a:hover, .sidebar-nav li a.active { 
+      background: var(--gold-gradient); 
+      color: #1a1a2e; 
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3);
+    }
 
-    #main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    header { height: 60px; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 1.5rem; }
-    .content-area { flex: 1; padding: 1.5rem; overflow-y: auto; }
+    #main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f5f7fa; }
+    header { 
+      height: 70px; 
+      background: var(--header-bg); 
+      border-bottom: 2px solid var(--accent-color); 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 0 2rem; 
+      color: #fff;
+    }
+    header #user-display { 
+      font-size: 1rem; 
+      background: rgba(255,255,255,0.1); 
+      padding: 0.4rem 1.2rem; 
+      border-radius: 20px; 
+      border: 1px solid var(--accent-color);
+    }
+    .content-area { flex: 1; padding: 1.5rem; overflow-y: auto; background: #f5f7fa; }
 
     .section-view { display: none; }
     .section-view.active { display: block; }
 
     .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-    .card { background-color: var(--bg-secondary); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-color); }
+    .card { 
+      background: #ffffff; 
+      padding: 1.25rem; 
+      border-radius: 12px; 
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
     .card h4 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
-    .card .value { font-size: 1.3rem; font-weight: bold; color: #fff; }
+    .card .value { font-size: 1.5rem; font-weight: bold; color: var(--text-main); }
+    .card .value.gold { color: var(--accent-color); }
 
     .form-group { margin-bottom: 0.9rem; }
-    .form-group label { display: block; margin-bottom: 0.3rem; color: var(--text-muted); font-size: 0.85rem; }
-    .form-control { width: 100%; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--bg-card); color: #fff; outline: none; }
-    .form-control:focus { border-color: var(--accent-color); }
+    .form-group label { display: block; margin-bottom: 0.3rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; }
+    .form-control { 
+      width: 100%; 
+      padding: 0.6rem 0.8rem; 
+      border-radius: 8px; 
+      border: 1.5px solid var(--border-color); 
+      background-color: #fff; 
+      color: var(--text-main); 
+      outline: none; 
+      transition: border-color 0.3s;
+    }
+    .form-control:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.2); }
 
-    .btn { padding: 0.55rem 1.1rem; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: background 0.2s; }
-    .btn-primary { background-color: var(--accent-color); color: #fff; }
-    .btn-primary:hover { background-color: var(--accent-hover); }
-    .btn-success { background-color: var(--success-color); color: #fff; }
-    .btn-danger { background-color: var(--danger-color); color: #fff; }
-    .btn-warning { background-color: var(--warning-color); color: #111; }
+    .btn { 
+      padding: 0.6rem 1.2rem; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-weight: 600; 
+      font-size: 0.85rem; 
+      transition: all 0.3s; 
+    }
+    .btn-primary { background: var(--gold-gradient); color: #1a1a2e; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(201, 168, 76, 0.4); }
+    .btn-success { background: linear-gradient(135deg, #28a745, #20c997); color: #fff; }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4); }
+    .btn-danger { background: linear-gradient(135deg, #dc3545, #e74c3c); color: #fff; }
+    .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4); }
+    .btn-warning { background: linear-gradient(135deg, #ffc107, #f39c12); color: #1a1a2e; }
+    .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4); }
 
-    .table-responsive { width: 100%; overflow-x: auto; background-color: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-color); margin-top: 1rem; }
+    .table-responsive { 
+      width: 100%; 
+      overflow-x: auto; 
+      background: #ffffff; 
+      border-radius: 12px; 
+      border: 1px solid var(--border-color); 
+      margin-top: 1rem; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
     table { width: 100%; border-collapse: collapse; text-align: right; }
     th, td { padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
-    th { background-color: var(--bg-card); color: var(--text-muted); }
+    th { background: var(--bg-secondary); color: var(--text-muted); font-weight: 600; }
 
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
     .modal.active { display: flex; }
-    .modal-content { background-color: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); }
+    .modal-content { 
+      background: #ffffff; 
+      padding: 2rem; 
+      border-radius: 16px; 
+      width: 100%; 
+      max-width: 650px; 
+      max-height: 90vh; 
+      overflow-y: auto; 
+      border: 2px solid var(--accent-color);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-content h3 { color: var(--accent-color); margin-bottom: 1.5rem; font-size: 1.4rem; }
 
-    .pos-container { display: grid; grid-template-columns: 1fr 390px; gap: 1rem; height: calc(100vh - 110px); }
-    .pos-products, .pos-cart { background: var(--bg-secondary); padding: 1rem; border-radius: 8px; display: flex; flex-direction: column; }
+    .pos-container { display: grid; grid-template-columns: 1fr 420px; gap: 1rem; height: calc(100vh - 110px); }
+    .pos-products, .pos-cart { background: #ffffff; padding: 1rem; border-radius: 12px; display: flex; flex-direction: column; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .cart-items { flex: 1; overflow-y: auto; margin: 0.8rem 0; }
 
     @media print {
@@ -80,13 +175,34 @@
       table { width: 100%; border-collapse: collapse; margin-top: 10px; }
       th, td { border: 1px solid #000; padding: 4px; text-align: right; }
     }
+
+    .brand-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    .brand-subtitle {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      -webkit-text-fill-color: var(--text-muted);
+    }
+    .section-title {
+      color: var(--accent-color);
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
 <body>
 
   <div id="auth-modal" class="auth-container">
     <div class="auth-card">
-      <h2>تسجيل الدخول - أبو السعود علام</h2>
+      <h2>أبو السعود علام <span>نظام إدارة المؤسسة والزيوت</span></h2>
       <form id="login-form">
         <div class="form-group">
           <label>اسم المستخدم</label>
@@ -96,24 +212,27 @@
           <label>كلمة المرور</label>
           <input type="password" id="login-password" class="form-control" required>
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">دخول</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; font-size:1rem; padding:0.8rem;">دخول</button>
       </form>
     </div>
   </div>
 
   <div id="sidebar">
-    <div class="sidebar-header">أبو السعود علام - إدارة المؤسسة والزيوت</div>
+    <div class="sidebar-header">
+      أبو السعود علام
+      <small>إدارة المؤسسة والزيوت</small>
+    </div>
     <ul class="sidebar-nav">
       <li><a data-target="dashboard" class="nav-link active">الرئيسية</a></li>
-      <li><a data-target="sales" class="nav-link">المبيعات والفاتورة الإلكترونية</a></li>
+      <li><a data-target="sales" class="nav-link">المبيعات والفاتورة</a></li>
       <li><a data-target="purchases" class="nav-link">المشتريات وكشوف الحساب</a></li>
-      <li><a data-target="inventory" class="nav-link">المخازن وتحويلات الفروع</a></li>
-      <li><a data-target="employees" class="nav-link">الأجور والسلف والرواتب</a></li>
+      <li><a data-target="inventory" class="nav-link">المخازن والتحويلات</a></li>
+      <li><a data-target="employees" class="nav-link">الأجور والرواتب</a></li>
       <li><a data-target="expenses" class="nav-link">المصروفات التفصيلية</a></li>
       <li><a data-target="assets" class="nav-link">الحسابات والأصول</a></li>
-      <li><a data-target="reports" class="nav-link">التقارير المالية والكنترول</a></li>
+      <li><a data-target="reports" class="nav-link">التقارير المالية</a></li>
       <li><a data-target="users" class="nav-link">إدارة المستخدمين</a></li>
-      <li><a data-target="settings" class="nav-link">النسخ الاحتياطي Excel</a></li>
+      <li><a data-target="settings" class="nav-link">النسخ الاحتياطي</a></li>
     </ul>
   </div>
 
@@ -126,12 +245,12 @@
     <div class="content-area">
       
       <section id="dashboard" class="section-view active">
-        <h2>لوحة التحكم والمراقبة</h2>
+        <h2 class="section-title">لوحة التحكم والمراقبة</h2>
         <div class="grid-cards" id="dash-cards"></div>
       </section>
 
       <section id="sales" class="section-view">
-        <h2>نقطة البيع - المبيعات والفواتير الإلكترونية</h2>
+        <h2 class="section-title">نقطة البيع - المبيعات والفواتير</h2>
         <div class="pos-container">
           <div class="pos-products">
             <div style="display:flex; gap:10px; margin-bottom:10px;">
@@ -149,7 +268,11 @@
             <h3>فاتورة المبيعات</h3>
             <div class="form-group">
               <label>العميل</label>
-              <select id="pos-customer" class="form-control"></select>
+              <input type="text" id="pos-customer" class="form-control" placeholder="اسم العميل (للآجل)">
+            </div>
+            <div class="form-group">
+              <label>رقم الهاتف</label>
+              <input type="text" id="pos-phone" class="form-control" placeholder="رقم هاتف العميل">
             </div>
             <div class="cart-items">
               <table>
@@ -158,13 +281,13 @@
               </table>
             </div>
             <div class="cart-summary">
-              <div>الإجمالي: <span id="pos-total">0</span> ج.م</div>
+              <div style="font-weight:bold; font-size:1.1rem;">الإجمالي: <span id="pos-total" style="color:var(--accent-color);">0</span> ج.م</div>
               <div class="form-group">
                 <label>الخصم</label>
                 <input type="number" id="pos-discount" class="form-control" value="0" onchange="updateCartUI()">
               </div>
               <div class="form-group">
-                <label>طريقة الدفع (محددة بالورقة)</label>
+                <label>طريقة الدفع</label>
                 <select id="pos-pay-type" class="form-control">
                   <option value="نقدي استلام الكاشير">مبيعات نقدية استلام الكاشير</option>
                   <option value="محفظة">مبيعات عن طريق المحفظة</option>
@@ -174,109 +297,109 @@
                   <option value="نقدي استلام المالك">مبيعات نقدية استلام المالك مباشرة</option>
                 </select>
               </div>
-              <button class="btn btn-success" style="width:100%; margin-top:5px;" onclick="completeSale()">إصدار وطباعة الفاتورة الإلكترونية</button>
+              <button class="btn btn-success" style="width:100%; margin-top:5px;" onclick="completeSale()">إصدار وطباعة الفاتورة</button>
             </div>
           </div>
         </div>
       </section>
 
       <section id="purchases" class="section-view">
-        <h2>المشتريات وكشوف الحساب للموردين</h2>
+        <h2 class="section-title">المشتريات وكشوف الحساب للموردين</h2>
         <button class="btn btn-primary" onclick="openPurchaseModal()">تسجيل مشتريات جديدة</button>
         <div class="table-responsive">
           <table>
-            <thead><tr><th>#</th><th>التاريخ</th><th>المورد</th><th>طريقة الدفع</th><th>المدفوع</th><th>المتبقي (آجل)</th><th>الإجمالي</th><th>تحكم</th></tr></thead>
+            <thead><tr><th>#</th><th>التاريخ</th><th>المورد</th><th>طريقة الدفع</th><th>المدفوع</th><th>المتبقي</th><th>الإجمالي</th><th>تحكم</th></tr></thead>
             <tbody id="purchases-table-body"></tbody>
           </table>
         </div>
       </section>
 
       <section id="inventory" class="section-view">
-        <h2>المخازن (الصالة المعروضات) والتحويلات</h2>
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <h2 class="section-title">المخازن والتحويلات</h2>
+        <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="openProductModal()">تسجيل صنف جديد</button>
-          <button class="btn btn-warning" onclick="openTransferModal()">إخراج/إدخال بضاعة (فرع المطرية / الفروع)</button>
+          <button class="btn btn-warning" onclick="openTransferModal()">إخراج/إدخال بضاعة (فرع اهالينا)</button>
         </div>
         <div class="table-responsive">
           <table>
-            <thead><tr><th>الكود</th><th>الاسم</th><th>الكمية بالصالة</th><th>سعر الشراء</th><th>سعر البيع</th><th>تحكم</th></tr></thead>
+            <thead><tr><th>الكود</th><th>الاسم</th><th>الكمية</th><th>سعر الشراء</th><th>سعر البيع</th><th>تحكم</th></tr></thead>
             <tbody id="inventory-table-body"></tbody>
           </table>
         </div>
       </section>
 
       <section id="employees" class="section-view">
-        <h2>إدارة أجور ورواتب الموظفين والسلف</h2>
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <h2 class="section-title">إدارة أجور ورواتب الموظفين والسلف</h2>
+        <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="openEmployeeModal()">إضافة موظف جديد</button>
           <button class="btn btn-warning" onclick="openAdvanceModal()">تسجيل سلفة موظف</button>
         </div>
         <div class="table-responsive">
           <table>
-            <thead><tr><th>اسم العامل</th><th>تاريخ التعيين</th><th>الراتب الأساسي</th><th>إجمالي السلف</th><th>صافي المرتب بعد الخصم</th><th>تحكم</th></tr></thead>
+            <thead><tr><th>اسم العامل</th><th>تاريخ التعيين</th><th>الراتب</th><th>إجمالي السلف</th><th>صافي المرتب</th><th>تحكم</th></tr></thead>
             <tbody id="employees-table-body"></tbody>
           </table>
         </div>
       </section>
 
       <section id="expenses" class="section-view">
-        <h2>إدارة المصروفات التفصيلية</h2>
+        <h2 class="section-title">إدارة المصروفات التفصيلية</h2>
         <button class="btn btn-primary" onclick="openExpenseModal()">تسجيل مصروف جديد</button>
         <div class="table-responsive">
           <table>
-            <thead><tr><th>التاريخ</th><th>نوع المصروف</th><th>المبلغ</th><th>البيان</th><th>طريقة الدفع</th><th>تحكم</th></tr></thead>
+            <thead><tr><th>التاريخ</th><th>نوع المصروف</th><th>المبلغ</th><th>البيان</th><th>تحكم</th></tr></thead>
             <tbody id="expenses-table-body"></tbody>
           </table>
         </div>
       </section>
 
       <section id="assets" class="section-view">
-        <h2>الحسابات والأصول (السيارات، الأثاث، الممتلكات)</h2>
+        <h2 class="section-title">الحسابات والأصول</h2>
         <button class="btn btn-primary" onclick="openAssetModal()">تسجيل أصل / حساب جديد</button>
         <div class="table-responsive">
           <table>
-            <thead><tr><th>نوع الحساب / الأصل</th><th>البيان والتفاصيل</th><th>القيمة التقديرية</th><th>تحكم</th></tr></thead>
+            <thead><tr><th>نوع الحساب</th><th>البيان</th><th>القيمة</th><th>تحكم</th></tr></thead>
             <tbody id="assets-table-body"></tbody>
           </table>
         </div>
       </section>
 
       <section id="reports" class="section-view">
-        <h2>التقارير المالية والكنترول (للمدير المالي فقط)</h2>
+        <h2 class="section-title">التقارير المالية والكنترول</h2>
         <div class="grid-cards" id="report-summary-cards"></div>
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
+        <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="generateFinancialReport('يومية')">تقرير يومي</button>
           <button class="btn btn-primary" onclick="generateFinancialReport('أسبوعية')">تقرير أسبوعي</button>
           <button class="btn btn-primary" onclick="generateFinancialReport('شهري')">تقرير شهري</button>
           <button class="btn btn-primary" onclick="generateFinancialReport('سنوي')">تقرير سنوي</button>
         </div>
         <div class="table-responsive">
-          <h3 style="padding:10px;">سجل رقابة المخرجات والمدخلات (Audit Log)</h3>
+          <h3 style="padding:10px; color:var(--accent-color);">سجل رقابة المخرجات والمدخلات</h3>
           <table>
-            <thead><tr><th>التاريخ</th><th>المستخدم</th><th>العملية (الكنترول)</th><th>التفاصيل</th></tr></thead>
+            <thead><tr><th>التاريخ</th><th>المستخدم</th><th>العملية</th><th>التفاصيل</th></tr></thead>
             <tbody id="audit-table-body"></tbody>
           </table>
         </div>
       </section>
 
       <section id="users" class="section-view">
-        <h2>إدارة المستخدمين والتصريح بالكنترول</h2>
+        <h2 class="section-title">إدارة المستخدمين والصلاحيات</h2>
         <button class="btn btn-primary" onclick="openUserModal()">إضافة مستخدم جديد</button>
         <div class="table-responsive">
           <table>
-            <thead><tr><th>اسم المستخدم</th><th>الدور / الصلاحية</th><th>الحالة</th></tr></thead>
+            <thead><tr><th>اسم المستخدم</th><th>الدور</th><th>الحالة</th></tr></thead>
             <tbody id="users-table-body"></tbody>
           </table>
         </div>
       </section>
 
       <section id="settings" class="section-view">
-        <h2>النسخ الاحتياطي في ملف Excel موحد</h2>
+        <h2 class="section-title">النسخ الاحتياطي</h2>
         <div class="grid-cards">
           <div class="card">
-            <h4>تصدير الشامل (ملف XLSX واحد)</h4>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">يصدر المبيعات، المشتريات، المخزون، المصروفات والرواتب في ملف واحد بصفحات متعدده.</p>
-            <button class="btn btn-success" onclick="exportToExcelBackup()">تصدير Excel الموحد</button>
+            <h4>تصدير الشامل (Excel)</h4>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">تصدير جميع البيانات في ملف Excel واحد.</p>
+            <button class="btn btn-success" onclick="exportToExcelBackup()">تصدير Excel</button>
           </div>
           <div class="card">
             <h4>استيراد نسخة احتياطية</h4>
@@ -291,7 +414,7 @@
 
   <div id="print-area"></div>
 
-  <!-- نوافذ التعديل -->
+  <!-- نوافذ التعديل والإضافة -->
   <div id="edit-product-modal" class="modal">
     <div class="modal-content">
       <h3>تعديل بيانات صنف</h3>
@@ -301,7 +424,7 @@
         <div class="form-group"><label>اسم الصنف</label><input type="text" id="edit-prod-name" class="form-control" required></div>
         <div class="form-group"><label>سعر الشراء</label><input type="number" id="edit-prod-buy" class="form-control" required></div>
         <div class="form-group"><label>سعر البيع</label><input type="number" id="edit-prod-sell" class="form-control" required></div>
-        <div class="form-group"><label>الكمية بالصالة</label><input type="number" id="edit-prod-qty" class="form-control" required></div>
+        <div class="form-group"><label>الكمية</label><input type="number" id="edit-prod-qty" class="form-control" required></div>
         <button type="submit" class="btn btn-success">تحديث الصنف</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('edit-product-modal')">إلغاء</button>
       </form>
@@ -313,21 +436,21 @@
       <h3>تعديل فاتورة مشتريات</h3>
       <form id="edit-purchase-form">
         <input type="hidden" id="edit-pur-id">
-        <div class="form-group"><label>اسم المورد</label><input type="text" id="edit-pur-supplier" class="form-control" required></div>
-        <div class="form-group"><label>اسم الصنف / البيان</label><input type="text" id="edit-pur-item" class="form-control" required></div>
+        <div class="form-group"><label>المورد</label><input type="text" id="edit-pur-supplier" class="form-control" required></div>
+        <div class="form-group"><label>البيان</label><input type="text" id="edit-pur-item" class="form-control" required></div>
         <div class="form-group"><label>الإجمالي</label><input type="number" id="edit-pur-total" class="form-control" required></div>
-        <div class="form-group"><label>المبلغ المدفوع</label><input type="number" id="edit-pur-paid" class="form-control" required></div>
+        <div class="form-group"><label>المدفوع</label><input type="number" id="edit-pur-paid" class="form-control" required></div>
         <div class="form-group">
           <label>طريقة الدفع</label>
           <select id="edit-pur-pay-type" class="form-control">
             <option value="نقدي من الصندوق">نقدي من الصندوق</option>
-            <option value="محفظة">محفظة إلكترونية</option>
-            <option value="انسته">أنستا باي InstaPay</option>
+            <option value="محفظة">محفظة</option>
+            <option value="انسته">أنستا باي</option>
             <option value="بنك">بنك</option>
-            <option value="من المالك مباشرة">من المالك مباشرة</option>
+            <option value="من المالك">من المالك</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-success">تحديث الفاتورة</button>
+        <button type="submit" class="btn btn-success">تحديث</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('edit-purchase-modal')">إلغاء</button>
       </form>
     </div>
@@ -340,8 +463,8 @@
         <input type="hidden" id="edit-emp-id">
         <div class="form-group"><label>اسم العامل</label><input type="text" id="edit-emp-name" class="form-control" required></div>
         <div class="form-group"><label>تاريخ التعيين</label><input type="date" id="edit-emp-date" class="form-control" required></div>
-        <div class="form-group"><label>الراتب الأساسي</label><input type="number" id="edit-emp-salary" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">تحديث الموظف</button>
+        <div class="form-group"><label>الراتب</label><input type="number" id="edit-emp-salary" class="form-control" required></div>
+        <button type="submit" class="btn btn-success">تحديث</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('edit-employee-modal')">إلغاء</button>
       </form>
     </div>
@@ -360,7 +483,7 @@
             <option value="مصروفات كهرباء">مصروفات كهرباء</option>
             <option value="مصروفات إيجار">مصروفات إيجار</option>
             <option value="مصروفات صيانة">مصروفات صيانة</option>
-            <option value="مصروفات ضيافة (سكر + شاي + مياه)">مصروفات ضيافة (سكر + شاي + مياه)</option>
+            <option value="مصروفات ضيافة">مصروفات ضيافة</option>
             <option value="مصروفات إكرامية">مصروفات إكرامية</option>
             <option value="مصروفات نظافة">مصروفات نظافة</option>
             <option value="أجور عمال">أجور عمال</option>
@@ -369,8 +492,8 @@
           </select>
         </div>
         <div class="form-group"><label>المبلغ</label><input type="number" id="edit-exp-amount" class="form-control" required></div>
-        <div class="form-group"><label>البيان / التفاصيل</label><input type="text" id="edit-exp-desc" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">تحديث المصروف</button>
+        <div class="form-group"><label>البيان</label><input type="text" id="edit-exp-desc" class="form-control" required></div>
+        <button type="submit" class="btn btn-success">تحديث</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('edit-expense-modal')">إلغاء</button>
       </form>
     </div>
@@ -382,35 +505,34 @@
       <form id="edit-asset-form">
         <input type="hidden" id="edit-asset-id">
         <div class="form-group">
-          <label>نوع الحساب / الأصل</label>
+          <label>النوع</label>
           <select id="edit-asset-type" class="form-control">
             <option value="السيارات">السيارات</option>
             <option value="الأثاث">الأثاث</option>
-            <option value="جميع ما تمتلكه المؤسسة">جميع ما تمتلكه المؤسسة (أصول)</option>
+            <option value="الأصول">الأصول</option>
             <option value="الالتزامات">الالتزامات</option>
             <option value="رأس المال">رأس المال</option>
-            <option value="مصاريف التاسيس">مصاريف التأسيس</option>
+            <option value="مصاريف التأسيس">مصاريف التأسيس</option>
             <option value="حقوق الملكية">حقوق الملكية</option>
           </select>
         </div>
         <div class="form-group"><label>البيان</label><input type="text" id="edit-asset-desc" class="form-control" required></div>
-        <div class="form-group"><label>القيمة المالية التقديرية</label><input type="number" id="edit-asset-value" class="form-control" required></div>
+        <div class="form-group"><label>القيمة</label><input type="number" id="edit-asset-value" class="form-control" required></div>
         <button type="submit" class="btn btn-success">تحديث</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('edit-asset-modal')">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- النوافذ الأصلية -->
   <div id="product-modal" class="modal">
     <div class="modal-content">
-      <h3>بيانات صنف بالمخزن</h3>
+      <h3>تسجيل صنف جديد</h3>
       <form id="product-form">
-        <div class="form-group"><label>كود الصنف</label><input type="text" id="prod-code" class="form-control" required></div>
+        <div class="form-group"><label>كود الصنف (تلقائي)</label><input type="text" id="prod-code" class="form-control" readonly></div>
         <div class="form-group"><label>اسم الصنف</label><input type="text" id="prod-name" class="form-control" required></div>
         <div class="form-group"><label>سعر الشراء</label><input type="number" id="prod-buy" class="form-control" required></div>
         <div class="form-group"><label>سعر البيع</label><input type="number" id="prod-sell" class="form-control" required></div>
-        <div class="form-group"><label>الكمية بالصالة</label><input type="number" id="prod-qty" class="form-control" required></div>
+        <div class="form-group"><label>الكمية</label><input type="number" id="prod-qty" class="form-control" required></div>
         <button type="submit" class="btn btn-success">حفظ الصنف</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('product-modal')">إلغاء</button>
       </form>
@@ -421,21 +543,21 @@
     <div class="modal-content">
       <h3>تسجيل فاتورة مشتريات</h3>
       <form id="purchase-form">
-        <div class="form-group"><label>اسم المورد</label><input type="text" id="pur-supplier" class="form-control" required></div>
-        <div class="form-group"><label>اسم الصنف / البيان</label><input type="text" id="pur-item" class="form-control" required></div>
+        <div class="form-group"><label>المورد</label><input type="text" id="pur-supplier" class="form-control" required></div>
+        <div class="form-group"><label>البيان</label><input type="text" id="pur-item" class="form-control" required></div>
         <div class="form-group"><label>الإجمالي</label><input type="number" id="pur-total" class="form-control" required></div>
-        <div class="form-group"><label>المبلغ المدفوع</label><input type="number" id="pur-paid" class="form-control" required></div>
+        <div class="form-group"><label>المدفوع</label><input type="number" id="pur-paid" class="form-control" required></div>
         <div class="form-group">
-          <label>طريقة الدفع (محددة بالورقة)</label>
+          <label>طريقة الدفع</label>
           <select id="pur-pay-type" class="form-control">
             <option value="نقدي من الصندوق">نقدي من الصندوق</option>
-            <option value="محفظة">محفظة إلكترونية</option>
-            <option value="انسته">أنستا باي InstaPay</option>
+            <option value="محفظة">محفظة</option>
+            <option value="انسته">أنستا باي</option>
             <option value="بنك">بنك</option>
-            <option value="من المالك مباشرة">من المالك مباشرة</option>
+            <option value="من المالك">من المالك</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-success">حفظ الفاتورة</button>
+        <button type="submit" class="btn btn-success">حفظ</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('purchase-modal')">إلغاء</button>
       </form>
     </div>
@@ -443,19 +565,18 @@
 
   <div id="transfer-modal" class="modal">
     <div class="modal-content">
-      <h3>تحويل بضائع بين الفروع</h3>
+      <h3>تحويل بضائع - فرع اهالينا</h3>
       <form id="transfer-form">
         <div class="form-group">
           <label>نوع الحركة</label>
           <select id="trans-type" class="form-control">
-            <option value="إخراج إلى فرع المطرية">إخراج بضاعة وتحويلها إلى فرع المطرية</option>
-            <option value="إخراج إلى فرع آخر">إخراج بضاعة وتحويلها إلى فرع آخر</option>
-            <option value="إدخال من فرع المطرية">إدخال بضاعة من فرع المطرية إلى الصالة</option>
+            <option value="إخراج إلى فرع اهالينا">إخراج بضاعة إلى فرع اهالينا</option>
+            <option value="إدخال من فرع اهالينا">إدخال بضاعة من فرع اهالينا</option>
           </select>
         </div>
         <div class="form-group"><label>اسم الصنف</label><input type="text" id="trans-item" class="form-control" required></div>
-        <div class="form-group"><label>الكمية المحولة</label><input type="number" id="trans-qty" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">تنفيذ التحويل</button>
+        <div class="form-group"><label>الكمية</label><input type="number" id="trans-qty" class="form-control" required></div>
+        <button type="submit" class="btn btn-success">تنفيذ</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('transfer-modal')">إلغاء</button>
       </form>
     </div>
@@ -463,7 +584,7 @@
 
   <div id="expense-modal" class="modal">
     <div class="modal-content">
-      <h3>تسجيل مصروف (حسب الورقة)</h3>
+      <h3>تسجيل مصروف</h3>
       <form id="expense-form">
         <div class="form-group">
           <label>نوع المصروف</label>
@@ -473,7 +594,7 @@
             <option value="مصروفات كهرباء">مصروفات كهرباء</option>
             <option value="مصروفات إيجار">مصروفات إيجار</option>
             <option value="مصروفات صيانة">مصروفات صيانة</option>
-            <option value="مصروفات ضيافة (سكر + شاي + مياه)">مصروفات ضيافة (سكر + شاي + مياه)</option>
+            <option value="مصروفات ضيافة">مصروفات ضيافة</option>
             <option value="مصروفات إكرامية">مصروفات إكرامية</option>
             <option value="مصروفات نظافة">مصروفات نظافة</option>
             <option value="أجور عمال">أجور عمال</option>
@@ -482,8 +603,8 @@
           </select>
         </div>
         <div class="form-group"><label>المبلغ</label><input type="number" id="exp-amount" class="form-control" required></div>
-        <div class="form-group"><label>البيان / التفاصيل</label><input type="text" id="exp-desc" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">تسجيل المصروف</button>
+        <div class="form-group"><label>البيان</label><input type="text" id="exp-desc" class="form-control" required></div>
+        <button type="submit" class="btn btn-success">تسجيل</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('expense-modal')">إلغاء</button>
       </form>
     </div>
@@ -495,8 +616,8 @@
       <form id="employee-form">
         <div class="form-group"><label>اسم العامل</label><input type="text" id="emp-name" class="form-control" required></div>
         <div class="form-group"><label>تاريخ التعيين</label><input type="date" id="emp-date" class="form-control" required></div>
-        <div class="form-group"><label>الراتب الأساسي والمميزات</label><input type="number" id="emp-salary" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">حفظ الموظف</button>
+        <div class="form-group"><label>الراتب</label><input type="number" id="emp-salary" class="form-control" required></div>
+        <button type="submit" class="btn btn-success">حفظ</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('employee-modal')">إلغاء</button>
       </form>
     </div>
@@ -510,8 +631,8 @@
           <label>الموظف</label>
           <select id="adv-emp-id" class="form-control" required></select>
         </div>
-        <div class="form-group"><label>مبلغ السلفة</label><input type="number" id="adv-amount" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">تسجيل السلفة</button>
+        <div class="form-group"><label>المبلغ</label><input type="number" id="adv-amount" class="form-control" required></div>
+        <button type="submit" class="btn btn-success">تسجيل</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('advance-modal')">إلغاء</button>
       </form>
     </div>
@@ -519,22 +640,22 @@
 
   <div id="asset-modal" class="modal">
     <div class="modal-content">
-      <h3>تسجيل أصل أو حساب مؤسسة</h3>
+      <h3>تسجيل أصل أو حساب</h3>
       <form id="asset-form">
         <div class="form-group">
-          <label>نوع الحساب / الأصل</label>
+          <label>النوع</label>
           <select id="asset-type" class="form-control">
             <option value="السيارات">السيارات</option>
             <option value="الأثاث">الأثاث</option>
-            <option value="جميع ما تمتلكه المؤسسة">جميع ما تمتلكه المؤسسة (أصول)</option>
+            <option value="الأصول">الأصول</option>
             <option value="الالتزامات">الالتزامات</option>
             <option value="رأس المال">رأس المال</option>
-            <option value="مصاريف التاسيس">مصاريف التأسيس</option>
+            <option value="مصاريف التأسيس">مصاريف التأسيس</option>
             <option value="حقوق الملكية">حقوق الملكية</option>
           </select>
         </div>
         <div class="form-group"><label>البيان</label><input type="text" id="asset-desc" class="form-control" required></div>
-        <div class="form-group"><label>القيمة المالية التقديرية</label><input type="number" id="asset-value" class="form-control" required></div>
+        <div class="form-group"><label>القيمة</label><input type="number" id="asset-value" class="form-control" required></div>
         <button type="submit" class="btn btn-success">حفظ</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('asset-modal')">إلغاء</button>
       </form>
@@ -543,12 +664,12 @@
 
   <div id="temp-item-modal" class="modal">
     <div class="modal-content">
-      <h3>إدخال وبيع صنف غير موجود فوراً</h3>
+      <h3>بيع صنف غير مسجل</h3>
       <form id="temp-item-form">
         <div class="form-group"><label>اسم الصنف</label><input type="text" id="temp-name" class="form-control" required></div>
         <div class="form-group"><label>السعر</label><input type="number" id="temp-price" class="form-control" required></div>
         <div class="form-group"><label>الكمية</label><input type="number" id="temp-qty" class="form-control" value="1" required></div>
-        <button type="submit" class="btn btn-success">إضافة للفاتورة الحالية</button>
+        <button type="submit" class="btn btn-success">إضافة للفاتورة</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('temp-item-modal')">إلغاء</button>
       </form>
     </div>
@@ -556,19 +677,19 @@
 
   <div id="user-modal" class="modal">
     <div class="modal-content">
-      <h3>إضافة مستخدم وتحديد الصلاحيات والكنترول</h3>
+      <h3>إضافة مستخدم جديد</h3>
       <form id="user-form">
         <div class="form-group"><label>اسم المستخدم</label><input type="text" id="usr-name" class="form-control" required></div>
         <div class="form-group"><label>كلمة المرور</label><input type="password" id="usr-pass" class="form-control" required></div>
         <div class="form-group">
-          <label>الدور والصلاحية</label>
+          <label>الدور</label>
           <select id="usr-role" class="form-control">
-            <option value="المدير المالي (الكنترول)">المدير المالي (الكنترول - كافة الصلاحيات)</option>
-            <option value="الكاشير">الكاشير (مبيعات فقط دون تعديل الفواتير)</option>
-            <option value="مسؤول المخزن">مسؤول المخزن (المخازن والتحويلات)</option>
+            <option value="المدير المالي (الكنترول)">المدير المالي (الكنترول)</option>
+            <option value="الكاشير">الكاشير</option>
+            <option value="مسؤول المخزن">مسؤول المخزن</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-success">حفظ المستخدم</button>
+        <button type="submit" class="btn btn-success">حفظ</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('user-modal')">إلغاء</button>
       </form>
     </div>
@@ -576,10 +697,10 @@
 
   <script>
     // ==========================================================================
-    // محرك البيانات والـ IndexedDB
+    // محرك البيانات
     // ==========================================================================
-    const DB_NAME = 'OilEnterprise_ERP_DB';
-    const DB_VERSION = 3;
+    const DB_NAME = 'AbuSaud_ERP_DB';
+    const DB_VERSION = 4;
     let dbInstance = null;
     let currentUser = null;
     let cart = [];
@@ -664,7 +785,6 @@
       }
     };
 
-    // الصلاحيات الحصريّة
     const PERMISSIONS = {
       'المدير المالي (الكنترول)': ['dashboard', 'sales', 'purchases', 'inventory', 'employees', 'expenses', 'assets', 'reports', 'users', 'settings'],
       'الكاشير': ['sales'],
@@ -687,8 +807,18 @@
       });
     }
 
+    // توليد كود تلقائي
+    async function generateProductCode() {
+      const products = await DataService.getAll('Products');
+      const maxNum = products.reduce((max, p) => {
+        const num = parseInt(p.code.replace('P-', ''));
+        return num > max ? num : max;
+      }, 0);
+      return 'P-' + String(maxNum + 1).padStart(3, '0');
+    }
+
     // ==========================================================================
-    // واجهة المبيعات والفواتير
+    // المبيعات
     // ==========================================================================
     async function renderPOS() {
       const prods = await DataService.getAll('Products');
@@ -768,9 +898,13 @@
       if (cart.length === 0) return alert('السلة فارغة!');
       const payType = document.getElementById('pos-pay-type').value;
       const total = parseFloat(document.getElementById('pos-total').innerText);
+      const customer = document.getElementById('pos-customer').value.trim() || 'عميل نقدي';
+      const phone = document.getElementById('pos-phone').value.trim() || '-';
       
       const saleData = {
         date: new Date().toLocaleString('ar-EG'),
+        customer: customer,
+        phone: phone,
         items: JSON.parse(JSON.stringify(cart)),
         total,
         payType,
@@ -778,9 +912,9 @@
       };
 
       await DataService.add('Sales', saleData);
-      await logAudit('إصدار فاتورة مبيعات', `فاتورة بمبلغ ${total} - طريقة الدفع: ${payType}`);
+      await logAudit('إصدار فاتورة مبيعات', `فاتورة بمبلغ ${total} - العميل: ${customer}`);
 
-      // تحديث كمية المخزون
+      // تحديث المخزون
       for (let item of cart) {
         if (typeof item.id === 'number') {
           const prod = await DataService.getById('Products', item.id);
@@ -791,33 +925,44 @@
         }
       }
 
-      // طباعة الفاتورة الإلكترونية
+      // طباعة الفاتورة
       const printArea = document.getElementById('print-area');
       printArea.innerHTML = `
         <div class="thermal-80mm">
-          <h3 style="text-align:center">فاتورة مبيعات إلكترونية</h3>
-          <p style="text-align:center">عهدة الكاشير: ${currentUser.username}</p>
+          <h3 style="text-align:center">أبو السعود علام</h3>
+          <p style="text-align:center; font-size:12px;">فاتورة مبيعات</p>
           <hr>
           <p>التاريخ: ${saleData.date}</p>
+          <p>العميل: ${customer}</p>
+          <p>الهاتف: ${phone}</p>
           <p>طريقة الدفع: ${payType}</p>
+          <hr>
           <table>
             <thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th></tr></thead>
             <tbody>${cart.map(c => `<tr><td>${c.name}</td><td>${c.qty}</td><td>${c.price * c.qty}</td></tr>`).join('')}</tbody>
           </table>
           <hr>
-          <h4>الإجمالي المطلوب: ${total} ج.م</h4>
+          <h4>الإجمالي: ${total} ج.م</h4>
+          <p style="text-align:center; font-size:10px; color:#666;">شكراً لكم - أبو السعود علام</p>
         </div>
       `;
       window.print();
       cart = [];
       updateCartUI();
+      document.getElementById('pos-customer').value = '';
+      document.getElementById('pos-phone').value = '';
       renderInventory();
     }
 
     // ==========================================================================
-    // المشتريات والمخازن والرواتب والمصروفات
+    // الإضافة والتعديل
     // ==========================================================================
-    function openProductModal() { document.getElementById('product-modal').classList.add('active'); }
+    function openProductModal() { 
+      document.getElementById('product-modal').classList.add('active');
+      generateProductCode().then(code => {
+        document.getElementById('prod-code').value = code;
+      });
+    }
     function openPurchaseModal() { document.getElementById('purchase-modal').classList.add('active'); }
     function openTransferModal() { document.getElementById('transfer-modal').classList.add('active'); }
     function openExpenseModal() { document.getElementById('expense-modal').classList.add('active'); }
@@ -875,7 +1020,7 @@
         item: document.getElementById('trans-item').value,
         qty: parseInt(document.getElementById('trans-qty').value)
       });
-      alert('تم تنفيذ نقل البضائع بنجاح.');
+      alert('تم تنفيذ النقل بنجاح.');
       closeModal('transfer-modal');
       document.getElementById('transfer-form').reset();
     });
@@ -943,11 +1088,11 @@
     });
 
     // ==========================================================================
-    // دوال التعديل
+    // التعديل
     // ==========================================================================
     async function editProduct(id) {
       if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('تنبيه: التعديل متاح فقط للكنترول والمدير المالي!');
+        return alert('التعديل متاح فقط للكنترول!');
       }
       const item = await DataService.getById('Products', id);
       if (!item) return alert('البيانات غير موجودة!');
@@ -977,7 +1122,7 @@
 
     async function editPurchase(id) {
       if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('تنبيه: التعديل متاح فقط للكنترول والمدير المالي!');
+        return alert('التعديل متاح فقط للكنترول!');
       }
       const item = await DataService.getById('Purchases', id);
       if (!item) return alert('البيانات غير موجودة!');
@@ -1009,7 +1154,7 @@
 
     async function editEmployee(id) {
       if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('تنبيه: التعديل متاح فقط للكنترول والمدير المالي!');
+        return alert('التعديل متاح فقط للكنترول!');
       }
       const item = await DataService.getById('Employees', id);
       if (!item) return alert('البيانات غير موجودة!');
@@ -1035,7 +1180,7 @@
 
     async function editExpense(id) {
       if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('تنبيه: التعديل متاح فقط للكنترول والمدير المالي!');
+        return alert('التعديل متاح فقط للكنترول!');
       }
       const item = await DataService.getById('Expenses', id);
       if (!item) return alert('البيانات غير موجودة!');
@@ -1062,7 +1207,7 @@
 
     async function editAsset(id) {
       if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('تنبيه: التعديل متاح فقط للكنترول والمدير المالي!');
+        return alert('التعديل متاح فقط للكنترول!');
       }
       const item = await DataService.getById('Assets', id);
       if (!item) return alert('البيانات غير موجودة!');
@@ -1087,7 +1232,7 @@
     });
 
     // ==========================================================================
-    // الجداول والعروض
+    // عرض الجداول
     // ==========================================================================
     async function renderInventory() {
       const list = await DataService.getAll('Products');
@@ -1100,7 +1245,7 @@
           <td>${p.sellPrice}</td>
           <td>
             <button class="btn btn-warning" onclick="editProduct(${p.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteItem('Products', ${p.id})">إلغاء</button>
+            <button class="btn btn-danger" onclick="deleteItem('Products', ${p.id})">حذف</button>
           </td>
         </tr>
       `).join('');
@@ -1119,7 +1264,7 @@
           <td>${p.total}</td>
           <td>
             <button class="btn btn-warning" onclick="editPurchase(${p.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteItem('Purchases', ${p.id})">إلغاء</button>
+            <button class="btn btn-danger" onclick="deleteItem('Purchases', ${p.id})">حذف</button>
           </td>
         </tr>
       `).join('');
@@ -1138,7 +1283,7 @@
           <td>${e.salary - totalAdv}</td>
           <td>
             <button class="btn btn-warning" onclick="editEmployee(${e.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteItem('Employees', ${e.id})">إلغاء</button>
+            <button class="btn btn-danger" onclick="deleteItem('Employees', ${e.id})">حذف</button>
           </td>
         </tr>`;
       }).join('');
@@ -1152,10 +1297,9 @@
           <td>${x.cat}</td>
           <td>${x.amount}</td>
           <td>${x.desc}</td>
-          <td>نقدي</td>
           <td>
             <button class="btn btn-warning" onclick="editExpense(${x.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteItem('Expenses', ${x.id})">إلغاء</button>
+            <button class="btn btn-danger" onclick="deleteItem('Expenses', ${x.id})">حذف</button>
           </td>
         </tr>
       `).join('');
@@ -1179,42 +1323,32 @@
     async function renderUsers() {
       const list = await DataService.getAll('Users');
       document.getElementById('users-table-body').innerHTML = list.map(u => `
-        <tr>
-          <td>${u.username}</td>
-          <td>${u.role}</td>
-          <td>مفعل</td>
-        </tr>
+        <tr><td>${u.username}</td><td>${u.role}</td><td>مفعل</td></tr>
       `).join('');
     }
 
     async function renderAudit() {
       const list = await DataService.getAll('AuditLogs');
       document.getElementById('audit-table-body').innerHTML = list.reverse().map(l => `
-        <tr>
-          <td>${l.date}</td>
-          <td>${l.user}</td>
-          <td>${l.action}</td>
-          <td>${l.details || ''}</td>
-        </tr>
+        <tr><td>${l.date}</td><td>${l.user}</td><td>${l.action}</td><td>${l.details || ''}</td></tr>
       `).join('');
     }
 
     async function deleteItem(store, id) {
       if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('تنبيه: التعديل والإلغاء متاح فقط للكنترول والمدير المالي!');
+        return alert('الحذف متاح فقط للكنترول!');
       }
-      if (confirm('هل أنت متأكد من الإلغاء؟')) {
+      if (confirm('هل أنت متأكد من الحذف؟')) {
         await DataService.delete(store, id);
-        await logAudit('حذف/إلغاء', `إلغاء سجل من ${store} رقم #${id}`);
-        // إعادة تحميل البيانات حسب الجدول
-        const sectionMap = {
+        await logAudit('حذف', `حذف من ${store} رقم #${id}`);
+        const map = {
           'Products': renderInventory,
           'Purchases': renderPurchases,
           'Employees': renderEmployees,
           'Expenses': renderExpenses,
           'Assets': renderAssets
         };
-        if (sectionMap[store]) sectionMap[store]();
+        if (map[store]) map[store]();
         else location.reload();
       }
     }
@@ -1225,14 +1359,14 @@
       const totalS = sales.reduce((s, x) => s + (x.total || 0), 0);
       const totalE = expenses.reduce((s, x) => s + (x.amount || 0), 0);
       document.getElementById('dash-cards').innerHTML = `
-        <div class="card"><h4>إجمالي المبيعات</h4><div class="value">${totalS} ج.م</div></div>
+        <div class="card"><h4>إجمالي المبيعات</h4><div class="value gold">${totalS} ج.م</div></div>
         <div class="card"><h4>إجمالي المصروفات</h4><div class="value">${totalE} ج.م</div></div>
-        <div class="card"><h4>صافي الأرباح التقديرية</h4><div class="value">${totalS - totalE} ج.م</div></div>
+        <div class="card"><h4>صافي الأرباح</h4><div class="value gold">${totalS - totalE} ج.م</div></div>
       `;
     }
 
     // ==========================================================================
-    // تصدير Excel الموحد
+    // Excel
     // ==========================================================================
     async function exportToExcelBackup() {
       const stores = ['Sales', 'Purchases', 'Products', 'Expenses', 'Employees', 'Assets', 'AuditLogs'];
@@ -1242,7 +1376,7 @@
         const ws = XLSX.utils.json_to_sheet(data);
         XLSX.utils.book_append_sheet(wb, ws, s);
       }
-      XLSX.writeFile(wb, `Enterprise_ERP_Unified_${new Date().toISOString().slice(0,10)}.xlsx`);
+      XLSX.writeFile(wb, `AbuSaud_Backup_${new Date().toISOString().slice(0,10)}.xlsx`);
     }
 
     async function importFromExcelBackup(e) {
@@ -1256,29 +1390,25 @@
             const rows = XLSX.utils.sheet_to_json(wb.Sheets[s]);
             await DataService.clearStore(s);
             for (let r of rows) {
-              // إزالة id إذا كان موجوداً ليتولى IndexedDB إنشاءه
               delete r.id;
               await DataService.add(s, r);
             }
           }
-          alert('تم استيراد النسخة الاحتياطية الموحدة بنجاح.');
+          alert('تم استيراد النسخة الاحتياطية بنجاح.');
           location.reload();
         } catch(err) {
-          alert('حدث خطأ أثناء استيراد الملف: ' + err.message);
+          alert('خطأ في الاستيراد: ' + err.message);
         }
       };
       reader.readAsArrayBuffer(file);
     }
 
-    // ==========================================================================
-    // التقارير المالية
-    // ==========================================================================
     function generateFinancialReport(type) {
-      alert(`جاري إنشاء تقرير ${type} ... يمكنك تنفيذ منطق التقرير حسب الحاجة.`);
+      alert(`جاري إنشاء تقرير ${type} ...`);
     }
 
     // ==========================================================================
-    // التهيئة والملاحة
+    // التهيئة
     // ==========================================================================
     function logoutUser() {
       sessionStorage.clear();
@@ -1290,7 +1420,7 @@
         e.preventDefault();
         const target = link.getAttribute('data-target');
         if (!checkPermission(target)) {
-          return alert('عذراً، هذا القسم يطلب صلاحية أعلى!');
+          return alert('هذا القسم يطلب صلاحية أعلى!');
         }
         
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -1299,7 +1429,6 @@
         link.classList.add('active');
         document.getElementById(target).classList.add('active');
 
-        // تحديث البيانات حسب القسم
         if (target === 'sales') renderPOS();
         if (target === 'purchases') renderPurchases();
         if (target === 'inventory') renderInventory();
@@ -1315,7 +1444,6 @@
       try {
         await initDB();
         
-        // إنشاء مستخدم افتراضي إذا لم يكن موجوداً
         const users = await DataService.getAll('Users');
         if (users.length === 0) {
           const pass = await hashPassword('admin123');
@@ -1329,7 +1457,6 @@
         const session = sessionStorage.getItem('currentUser');
         if (session) {
           currentUser = JSON.parse(session);
-          // التأكد من أن المستخدم لا يزال موجوداً في قاعدة البيانات
           const userList = await DataService.getAll('Users');
           const validUser = userList.find(u => u.username === currentUser.username);
           if (!validUser) {
@@ -1343,7 +1470,6 @@
           }
         }
 
-        // نموذج تسجيل الدخول
         document.getElementById('login-form').addEventListener('submit', async (e) => {
           e.preventDefault();
           const u = document.getElementById('login-username').value.trim();
@@ -1362,7 +1488,7 @@
           }
         });
       } catch(err) {
-        console.error('خطأ في تهيئة البرنامج:', err);
+        console.error('خطأ:', err);
         alert('حدث خطأ في تهيئة البرنامج، يرجى تحديث الصفحة.');
       }
     });
