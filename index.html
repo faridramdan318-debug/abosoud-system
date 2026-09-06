@@ -134,6 +134,8 @@
     .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4); }
     .btn-warning { background: linear-gradient(135deg, #ffc107, #f39c12); color: #1a1a2e; }
     .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4); }
+    .btn-info { background: linear-gradient(135deg, #17a2b8, #0dcaf0); color: #fff; }
+    .btn-info:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(23, 162, 184, 0.4); }
 
     .table-responsive { 
       width: 100%; 
@@ -155,7 +157,7 @@
       padding: 2rem; 
       border-radius: 16px; 
       width: 100%; 
-      max-width: 650px; 
+      max-width: 750px; 
       max-height: 90vh; 
       overflow-y: auto; 
       border: 2px solid var(--accent-color);
@@ -196,6 +198,8 @@
       padding-bottom: 0.5rem;
       margin-bottom: 1rem;
     }
+    .edit-cart-item { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+    .edit-cart-item input { width: 60px; padding: 3px; border-radius: 4px; border: 1px solid var(--border-color); text-align: center; }
   </style>
 </head>
 <body>
@@ -251,53 +255,68 @@
 
       <section id="sales" class="section-view">
         <h2 class="section-title">نقطة البيع - المبيعات والفواتير</h2>
-        <div class="pos-container">
-          <div class="pos-products">
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-              <input type="text" id="pos-search" class="form-control" placeholder="بحث باسم الصنف أو الكود..." onkeyup="filterPOSProducts()">
-              <button class="btn btn-warning" onclick="openTempItemModal()">+ بيع صنف غير موجود</button>
-            </div>
-            <div class="table-responsive">
-              <table>
-                <thead><tr><th>الكود</th><th>الصنف</th><th>الكمية</th><th>السعر</th><th>إضافة</th></tr></thead>
-                <tbody id="pos-product-list"></tbody>
-              </table>
-            </div>
+        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="openNewSale()">فاتورة مبيعات جديدة</button>
+          <button class="btn btn-info" onclick="renderSales()">عرض المبيعات</button>
+        </div>
+        <div id="sales-list-container">
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>الهاتف</th><th>الإجمالي</th><th>طريقة الدفع</th><th>الكاشير</th><th>تحكم</th></tr></thead>
+              <tbody id="sales-table-body"></tbody>
+            </table>
           </div>
-          <div class="pos-cart">
-            <h3>فاتورة المبيعات</h3>
-            <div class="form-group">
-              <label>العميل</label>
-              <input type="text" id="pos-customer" class="form-control" placeholder="اسم العميل (للآجل)">
+        </div>
+        <div id="new-sale-container" style="display:none;">
+          <div class="pos-container">
+            <div class="pos-products">
+              <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <input type="text" id="pos-search" class="form-control" placeholder="بحث باسم الصنف أو الكود..." onkeyup="filterPOSProducts()">
+                <button class="btn btn-warning" onclick="openTempItemModal()">+ بيع صنف غير موجود</button>
+              </div>
+              <div class="table-responsive">
+                <table>
+                  <thead><tr><th>الكود</th><th>الصنف</th><th>الكمية</th><th>السعر</th><th>إضافة</th></tr></thead>
+                  <tbody id="pos-product-list"></tbody>
+                </table>
+              </div>
             </div>
-            <div class="form-group">
-              <label>رقم الهاتف</label>
-              <input type="text" id="pos-phone" class="form-control" placeholder="رقم هاتف العميل">
-            </div>
-            <div class="cart-items">
-              <table>
-                <thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>حذف</th></tr></thead>
-                <tbody id="pos-cart-list"></tbody>
-              </table>
-            </div>
-            <div class="cart-summary">
-              <div style="font-weight:bold; font-size:1.1rem;">الإجمالي: <span id="pos-total" style="color:var(--accent-color);">0</span> ج.م</div>
+            <div class="pos-cart">
+              <h3>فاتورة المبيعات</h3>
               <div class="form-group">
-                <label>الخصم</label>
-                <input type="number" id="pos-discount" class="form-control" value="0" onchange="updateCartUI()">
+                <label>العميل</label>
+                <input type="text" id="pos-customer" class="form-control" placeholder="اسم العميل (للآجل)">
               </div>
               <div class="form-group">
-                <label>طريقة الدفع</label>
-                <select id="pos-pay-type" class="form-control">
-                  <option value="نقدي استلام الكاشير">مبيعات نقدية استلام الكاشير</option>
-                  <option value="محفظة">مبيعات عن طريق المحفظة</option>
-                  <option value="بنك انستا">مبيعات بنك حساب انستا</option>
-                  <option value="تحويل بنكي آخر">مبيعات تحويل في حساب البنوك الأخرى</option>
-                  <option value="آجل">مبيعات آجلة باسم العميل (كشف حساب)</option>
-                  <option value="نقدي استلام المالك">مبيعات نقدية استلام المالك مباشرة</option>
-                </select>
+                <label>رقم الهاتف</label>
+                <input type="text" id="pos-phone" class="form-control" placeholder="رقم هاتف العميل">
               </div>
-              <button class="btn btn-success" style="width:100%; margin-top:5px;" onclick="completeSale()">إصدار وطباعة الفاتورة</button>
+              <div class="cart-items">
+                <table>
+                  <thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>حذف</th></tr></thead>
+                  <tbody id="pos-cart-list"></tbody>
+                </table>
+              </div>
+              <div class="cart-summary">
+                <div style="font-weight:bold; font-size:1.1rem;">الإجمالي: <span id="pos-total" style="color:var(--accent-color);">0</span> ج.م</div>
+                <div class="form-group">
+                  <label>الخصم</label>
+                  <input type="number" id="pos-discount" class="form-control" value="0" onchange="updateCartUI()">
+                </div>
+                <div class="form-group">
+                  <label>طريقة الدفع</label>
+                  <select id="pos-pay-type" class="form-control">
+                    <option value="نقدي استلام الكاشير">مبيعات نقدية استلام الكاشير</option>
+                    <option value="محفظة">مبيعات عن طريق المحفظة</option>
+                    <option value="بنك انستا">مبيعات بنك حساب انستا</option>
+                    <option value="تحويل بنكي آخر">مبيعات تحويل في حساب البنوك الأخرى</option>
+                    <option value="آجل">مبيعات آجلة باسم العميل (كشف حساب)</option>
+                    <option value="نقدي استلام المالك">مبيعات نقدية استلام المالك مباشرة</option>
+                  </select>
+                </div>
+                <button class="btn btn-success" style="width:100%; margin-top:5px;" onclick="completeSale()">إصدار وطباعة الفاتورة</button>
+                <button class="btn btn-danger" style="width:100%; margin-top:5px;" onclick="cancelNewSale()">إلغاء الفاتورة</button>
+              </div>
             </div>
           </div>
         </div>
@@ -414,7 +433,48 @@
 
   <div id="print-area"></div>
 
-  <!-- نوافذ التعديل والإضافة -->
+  <!-- نافذة تعديل الفاتورة -->
+  <div id="edit-sale-modal" class="modal">
+    <div class="modal-content">
+      <h3>تعديل فاتورة مبيعات</h3>
+      <form id="edit-sale-form">
+        <input type="hidden" id="edit-sale-id">
+        <div class="form-group">
+          <label>العميل</label>
+          <input type="text" id="edit-sale-customer" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>رقم الهاتف</label>
+          <input type="text" id="edit-sale-phone" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>طريقة الدفع</label>
+          <select id="edit-sale-pay-type" class="form-control">
+            <option value="نقدي استلام الكاشير">مبيعات نقدية استلام الكاشير</option>
+            <option value="محفظة">مبيعات عن طريق المحفظة</option>
+            <option value="بنك انستا">مبيعات بنك حساب انستا</option>
+            <option value="تحويل بنكي آخر">مبيعات تحويل في حساب البنوك الأخرى</option>
+            <option value="آجل">مبيعات آجلة باسم العميل (كشف حساب)</option>
+            <option value="نقدي استلام المالك">مبيعات نقدية استلام المالك مباشرة</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>الخصم</label>
+          <input type="number" id="edit-sale-discount" class="form-control" value="0">
+        </div>
+        <div style="border:1px solid var(--border-color); border-radius:8px; padding:10px; margin-bottom:10px;">
+          <label style="font-weight:600; color:var(--text-muted);">الأصناف:</label>
+          <div id="edit-sale-items-container"></div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="submit" class="btn btn-success">تحديث الفاتورة</button>
+          <button type="button" class="btn btn-danger" onclick="closeModal('edit-sale-modal')">إلغاء</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- نوافذ التعديل والإضافة الأخرى -->
   <div id="edit-product-modal" class="modal">
     <div class="modal-content">
       <h3>تعديل بيانات صنف</h3>
@@ -700,7 +760,7 @@
     // محرك البيانات
     // ==========================================================================
     const DB_NAME = 'AbuSaud_ERP_DB';
-    const DB_VERSION = 4;
+    const DB_VERSION = 5;
     let dbInstance = null;
     let currentUser = null;
     let cart = [];
@@ -807,7 +867,6 @@
       });
     }
 
-    // توليد كود تلقائي
     async function generateProductCode() {
       const products = await DataService.getAll('Products');
       const maxNum = products.reduce((max, p) => {
@@ -820,6 +879,25 @@
     // ==========================================================================
     // المبيعات
     // ==========================================================================
+    let isNewSaleMode = false;
+
+    function openNewSale() {
+      isNewSaleMode = true;
+      document.getElementById('sales-list-container').style.display = 'none';
+      document.getElementById('new-sale-container').style.display = 'block';
+      cart = [];
+      updateCartUI();
+      renderPOS();
+    }
+
+    function cancelNewSale() {
+      isNewSaleMode = false;
+      document.getElementById('sales-list-container').style.display = 'block';
+      document.getElementById('new-sale-container').style.display = 'none';
+      cart = [];
+      renderSales();
+    }
+
     async function renderPOS() {
       const prods = await DataService.getAll('Products');
       renderPOSProductsList(prods);
@@ -900,14 +978,16 @@
       const total = parseFloat(document.getElementById('pos-total').innerText);
       const customer = document.getElementById('pos-customer').value.trim() || 'عميل نقدي';
       const phone = document.getElementById('pos-phone').value.trim() || '-';
+      const discount = parseFloat(document.getElementById('pos-discount').value) || 0;
       
       const saleData = {
         date: new Date().toLocaleString('ar-EG'),
         customer: customer,
         phone: phone,
         items: JSON.parse(JSON.stringify(cart)),
-        total,
-        payType,
+        total: total,
+        discount: discount,
+        payType: payType,
         cashier: currentUser.username
       };
 
@@ -951,11 +1031,209 @@
       updateCartUI();
       document.getElementById('pos-customer').value = '';
       document.getElementById('pos-phone').value = '';
+      document.getElementById('pos-discount').value = '0';
+      renderInventory();
+      cancelNewSale();
+    }
+
+    // ==========================================================================
+    // عرض المبيعات مع إمكانية التعديل
+    // ==========================================================================
+    async function renderSales() {
+      const list = await DataService.getAll('Sales');
+      document.getElementById('sales-table-body').innerHTML = list.reverse().map(s => `
+        <tr>
+          <td>${s.id}</td>
+          <td>${s.date}</td>
+          <td>${s.customer || 'عميل نقدي'}</td>
+          <td>${s.phone || '-'}</td>
+          <td>${s.total} ج.م</td>
+          <td>${s.payType}</td>
+          <td>${s.cashier || '-'}</td>
+          <td>
+            <button class="btn btn-warning" onclick="editSale(${s.id})">تعديل</button>
+            <button class="btn btn-danger" onclick="deleteSale(${s.id})">حذف</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ==========================================================================
+    // تعديل الفاتورة
+    // ==========================================================================
+    let editCartItems = [];
+
+    async function editSale(id) {
+      if (currentUser.role !== 'المدير المالي (الكنترول)') {
+        return alert('التعديل متاح فقط للكنترول!');
+      }
+      const sale = await DataService.getById('Sales', id);
+      if (!sale) return alert('الفاتورة غير موجودة!');
+      
+      document.getElementById('edit-sale-id').value = sale.id;
+      document.getElementById('edit-sale-customer').value = sale.customer || '';
+      document.getElementById('edit-sale-phone').value = sale.phone || '';
+      document.getElementById('edit-sale-pay-type').value = sale.payType || 'نقدي استلام الكاشير';
+      document.getElementById('edit-sale-discount').value = sale.discount || 0;
+      
+      editCartItems = JSON.parse(JSON.stringify(sale.items || []));
+      renderEditSaleItems();
+      
+      document.getElementById('edit-sale-modal').classList.add('active');
+    }
+
+    function renderEditSaleItems() {
+      const container = document.getElementById('edit-sale-items-container');
+      container.innerHTML = '';
+      editCartItems.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'edit-cart-item';
+        div.style.cssText = 'display:flex; gap:8px; align-items:center; padding:5px 0; border-bottom:1px solid #eee; flex-wrap:wrap;';
+        div.innerHTML = `
+          <span style="flex:2; min-width:100px;"><strong>${item.name}</strong></span>
+          <label style="font-size:12px;">الكمية:</label>
+          <input type="number" class="edit-item-qty" value="${item.qty}" min="1" style="width:60px;" data-index="${index}">
+          <label style="font-size:12px;">السعر:</label>
+          <input type="number" class="edit-item-price" value="${item.price}" min="0" style="width:80px;" data-index="${index}">
+          <button class="btn btn-danger" style="padding:2px 8px; font-size:12px;" onclick="removeEditItem(${index})">×</button>
+        `;
+        container.appendChild(div);
+      });
+      
+      // إضافة مستمعين للتحديث التلقائي
+      document.querySelectorAll('.edit-item-qty').forEach(el => {
+        el.addEventListener('change', function() {
+          const idx = parseInt(this.dataset.index);
+          editCartItems[idx].qty = parseInt(this.value) || 1;
+          updateEditTotal();
+        });
+      });
+      document.querySelectorAll('.edit-item-price').forEach(el => {
+        el.addEventListener('change', function() {
+          const idx = parseInt(this.dataset.index);
+          editCartItems[idx].price = parseFloat(this.value) || 0;
+          updateEditTotal();
+        });
+      });
+      
+      updateEditTotal();
+    }
+
+    function removeEditItem(index) {
+      editCartItems.splice(index, 1);
+      renderEditSaleItems();
+    }
+
+    function updateEditTotal() {
+      const total = editCartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const discount = parseFloat(document.getElementById('edit-sale-discount').value) || 0;
+      const finalTotal = Math.max(0, total - discount);
+      const totalEl = document.getElementById('edit-sale-items-container');
+      let totalDisplay = totalEl.querySelector('.edit-total-display');
+      if (!totalDisplay) {
+        totalDisplay = document.createElement('div');
+        totalDisplay.className = 'edit-total-display';
+        totalDisplay.style.cssText = 'margin-top:10px; font-weight:bold; font-size:1.1rem; color:var(--accent-color);';
+        totalEl.appendChild(totalDisplay);
+      }
+      totalDisplay.innerHTML = `الإجمالي: ${total} ج.م | بعد الخصم: ${finalTotal} ج.م`;
+    }
+
+    document.getElementById('edit-sale-discount').addEventListener('change', updateEditTotal);
+
+    document.getElementById('edit-sale-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('edit-sale-id').value);
+      const customer = document.getElementById('edit-sale-customer').value.trim() || 'عميل نقدي';
+      const phone = document.getElementById('edit-sale-phone').value.trim() || '-';
+      const payType = document.getElementById('edit-sale-pay-type').value;
+      const discount = parseFloat(document.getElementById('edit-sale-discount').value) || 0;
+      
+      // حساب الإجمالي الجديد
+      const total = editCartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const finalTotal = Math.max(0, total - discount);
+      
+      // الحصول على الفاتورة القديمة لاستعادة المخزون
+      const oldSale = await DataService.getById('Sales', id);
+      
+      // استعادة المخزون القديم
+      if (oldSale && oldSale.items) {
+        for (let item of oldSale.items) {
+          if (typeof item.id === 'number') {
+            const prod = await DataService.getById('Products', item.id);
+            if (prod) {
+              prod.qty = (prod.qty || 0) + (item.qty || 0);
+              await DataService.update('Products', prod);
+            }
+          }
+        }
+      }
+      
+      // تطبيق المخزون الجديد
+      for (let item of editCartItems) {
+        if (typeof item.id === 'number') {
+          const prod = await DataService.getById('Products', item.id);
+          if (prod) {
+            prod.qty = Math.max(0, (prod.qty || 0) - (item.qty || 0));
+            await DataService.update('Products', prod);
+          }
+        }
+      }
+      
+      // تحديث الفاتورة
+      await DataService.update('Sales', {
+        id: id,
+        date: oldSale ? oldSale.date : new Date().toLocaleString('ar-EG'),
+        customer: customer,
+        phone: phone,
+        items: editCartItems,
+        total: finalTotal,
+        discount: discount,
+        payType: payType,
+        cashier: currentUser.username,
+        edited: true,
+        editedBy: currentUser.username,
+        editDate: new Date().toLocaleString('ar-EG')
+      });
+      
+      await logAudit('تعديل فاتورة مبيعات', `تعديل فاتورة #${id} - العميل: ${customer}`);
+      closeModal('edit-sale-modal');
+      renderSales();
+      renderInventory();
+      alert('تم تحديث الفاتورة بنجاح!');
+    });
+
+    // ==========================================================================
+    // حذف الفاتورة
+    // ==========================================================================
+    async function deleteSale(id) {
+      if (currentUser.role !== 'المدير المالي (الكنترول)') {
+        return alert('الحذف متاح فقط للكنترول!');
+      }
+      if (!confirm('هل أنت متأكد من حذف هذه الفاتورة؟')) return;
+      
+      const sale = await DataService.getById('Sales', id);
+      if (sale && sale.items) {
+        // استعادة المخزون
+        for (let item of sale.items) {
+          if (typeof item.id === 'number') {
+            const prod = await DataService.getById('Products', item.id);
+            if (prod) {
+              prod.qty = (prod.qty || 0) + (item.qty || 0);
+              await DataService.update('Products', prod);
+            }
+          }
+        }
+      }
+      
+      await DataService.delete('Sales', id);
+      await logAudit('حذف فاتورة مبيعات', `حذف فاتورة #${id}`);
+      renderSales();
       renderInventory();
     }
 
     // ==========================================================================
-    // الإضافة والتعديل
+    // الإضافة والتعديل الأخرى
     // ==========================================================================
     function openProductModal() { 
       document.getElementById('product-modal').classList.add('active');
@@ -1088,7 +1366,7 @@
     });
 
     // ==========================================================================
-    // التعديل
+    // التعديلات الأخرى
     // ==========================================================================
     async function editProduct(id) {
       if (currentUser.role !== 'المدير المالي (الكنترول)') {
@@ -1429,7 +1707,11 @@
         link.classList.add('active');
         document.getElementById(target).classList.add('active');
 
-        if (target === 'sales') renderPOS();
+        if (target === 'sales') { 
+          if (!isNewSaleMode) {
+            renderSales();
+          }
+        }
         if (target === 'purchases') renderPurchases();
         if (target === 'inventory') renderInventory();
         if (target === 'employees') renderEmployees();
@@ -1467,6 +1749,7 @@
             document.getElementById('auth-modal').style.display = 'none';
             document.getElementById('user-display').innerText = `المستخدم: ${currentUser.username} (${currentUser.role})`;
             renderDashboard();
+            renderSales();
           }
         }
 
@@ -1482,6 +1765,7 @@
             document.getElementById('auth-modal').style.display = 'none';
             document.getElementById('user-display').innerText = `المستخدم: ${currentUser.username} (${currentUser.role})`;
             renderDashboard();
+            renderSales();
             document.getElementById('login-form').reset();
           } else {
             alert('بيانات الدخول غير صحيحة!');
