@@ -140,6 +140,7 @@
     .btn-info:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(23, 162, 184, 0.4); }
     .btn-secondary { background: #6c757d; color: #fff; }
     .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4); }
+    .btn-sm { padding: 0.3rem 0.7rem; font-size: 0.75rem; }
 
     .table-responsive { 
       width: 100%; 
@@ -214,9 +215,16 @@
         display: flex; 
         justify-content: space-between; 
         font-size: 12px;
-        margin-bottom: 10px;
-        padding: 5px 0;
+        margin-bottom: 5px;
+        padding: 3px 0;
+      }
+      .print-invoice .info-line {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        padding: 2px 0;
         border-bottom: 1px dashed #ddd;
+        margin-bottom: 5px;
       }
       .print-invoice table { 
         width: 100%; 
@@ -272,6 +280,12 @@
         color: #fff;
         background: #c9a84c;
       }
+      .print-report { max-width: 100%; }
+      .print-report table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+      .print-report th, .print-report td { border: 1px solid #000; padding: 6px; text-align: right; }
+      .print-report h1, .print-report h2, .print-report h3 { text-align: center; }
+      .print-report .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+      .print-report .total-row { font-weight: bold; background: #f0f0f0; }
     }
 
     .brand-title {
@@ -303,6 +317,12 @@
       font-weight: 600;
       background: var(--gold-gradient);
       color: #1a1a2e;
+    }
+    .actions-cell { display: flex; gap: 5px; flex-wrap: wrap; }
+    
+    #print-area { display: none; }
+    @media print {
+      #print-area { display: block; }
     }
   </style>
 </head>
@@ -359,19 +379,34 @@
       </section>
 
       <section id="sales" class="section-view">
-        <h2 class="section-title">نقطة البيع - المبيعات والفواتير</h2>
+        <h2 class="section-title">المبيعات والفواتير</h2>
         <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="openNewSale()">فاتورة مبيعات جديدة</button>
-          <button class="btn btn-info" onclick="renderSales()">عرض المبيعات</button>
+          <button class="btn btn-info" onclick="renderSales()">تحديث السجل</button>
         </div>
+        
         <div id="sales-list-container">
+          <h3 style="color:var(--text-muted); margin-bottom:10px;">سجل الفواتير</h3>
           <div class="table-responsive">
             <table>
-              <thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>الهاتف</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>طريقة الدفع</th><th>الكاشير</th><th>تحكم</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>التاريخ</th>
+                  <th>العميل</th>
+                  <th>الإجمالي</th>
+                  <th>المدفوع</th>
+                  <th>المتبقي</th>
+                  <th>طريقة الدفع</th>
+                  <th>الكاشير</th>
+                  <th>تحكم</th>
+                </tr>
+              </thead>
               <tbody id="sales-table-body"></tbody>
             </table>
           </div>
         </div>
+        
         <div id="new-sale-container" style="display:none;">
           <div class="pos-container">
             <div class="pos-products">
@@ -387,17 +422,13 @@
               </div>
             </div>
             <div class="pos-cart">
-              <h3>فاتورة المبيعات</h3>
+              <h3>فاتورة جديدة</h3>
               <div class="form-group">
                 <label>العميل</label>
-                <input type="text" id="pos-customer" class="form-control" placeholder="اسم العميل (للآجل)">
+                <input type="text" id="pos-customer" class="form-control" placeholder="اسم العميل">
               </div>
               <div class="form-group">
-                <label>رقم الهاتف</label>
-                <input type="text" id="pos-phone" class="form-control" placeholder="رقم هاتف العميل">
-              </div>
-              <div class="form-group">
-                <label>المبلغ المدفوع (للآجل)</label>
+                <label>المبلغ المدفوع</label>
                 <input type="number" id="pos-paid" class="form-control" value="0" placeholder="المبلغ المدفوع الآن" oninput="updateCartUI()">
               </div>
               <div class="cart-items">
@@ -417,16 +448,15 @@
                 <div class="form-group">
                   <label>طريقة الدفع</label>
                   <select id="pos-pay-type" class="form-control">
-                    <option value="نقدي استلام الكاشير">مبيعات نقدية استلام الكاشير</option>
-                    <option value="محفظة">مبيعات عن طريق المحفظة</option>
-                    <option value="بنك انستا">مبيعات بنك حساب انستا</option>
-                    <option value="تحويل بنكي آخر">مبيعات تحويل في حساب البنوك الأخرى</option>
-                    <option value="آجل">مبيعات آجلة باسم العميل (كشف حساب)</option>
-                    <option value="نقدي استلام المالك">مبيعات نقدية استلام المالك مباشرة</option>
+                    <option value="نقدي">نقدي</option>
+                    <option value="محفظة">محفظة</option>
+                    <option value="بنك انستا">بنك انستا</option>
+                    <option value="تحويل بنكي">تحويل بنكي</option>
+                    <option value="آجل">آجل</option>
                   </select>
                 </div>
                 <button class="btn btn-success" style="width:100%; margin-top:5px;" onclick="completeSale()">إصدار وطباعة الفاتورة</button>
-                <button class="btn btn-danger" style="width:100%; margin-top:5px;" onclick="cancelNewSale()">إلغاء الفاتورة</button>
+                <button class="btn btn-danger" style="width:100%; margin-top:5px;" onclick="cancelNewSale()">إلغاء</button>
               </div>
             </div>
           </div>
@@ -438,6 +468,7 @@
         <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="openCustomerPaymentModal()">تسجيل دفعة من عميل</button>
           <button class="btn btn-success" onclick="printCustomersReport()">طباعة كشف العملاء</button>
+          <button class="btn btn-info" onclick="exportCustomersToExcel()">تصدير Excel</button>
         </div>
         <div class="table-responsive">
           <table>
@@ -445,7 +476,6 @@
               <tr>
                 <th>#</th>
                 <th>اسم العميل</th>
-                <th>الهاتف</th>
                 <th>إجمالي المشتريات</th>
                 <th>إجمالي المدفوع</th>
                 <th>المتبقي</th>
@@ -468,7 +498,7 @@
       </section>
 
       <section id="purchases" class="section-view">
-        <h2 class="section-title">المشتريات وكشوف الحساب للموردين</h2>
+        <h2 class="section-title">المشتريات</h2>
         <button class="btn btn-primary" onclick="openPurchaseModal()">تسجيل مشتريات جديدة</button>
         <div class="table-responsive">
           <table>
@@ -482,7 +512,7 @@
         <h2 class="section-title">المخازن والتحويلات</h2>
         <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="openProductModal()">تسجيل صنف جديد</button>
-          <button class="btn btn-warning" onclick="openTransferModal()">إخراج/إدخال بضاعة (فرع اهالينا)</button>
+          <button class="btn btn-warning" onclick="openTransferModal()">إخراج/إدخال بضاعة</button>
         </div>
         <div class="table-responsive">
           <table>
@@ -532,7 +562,7 @@
       </section>
 
       <section id="expenses" class="section-view">
-        <h2 class="section-title">إدارة المصروفات التفصيلية</h2>
+        <h2 class="section-title">إدارة المصروفات</h2>
         <button class="btn btn-primary" onclick="openExpenseModal()">تسجيل مصروف جديد</button>
         <div class="table-responsive">
           <table>
@@ -554,7 +584,7 @@
       </section>
 
       <section id="reports" class="section-view">
-        <h2 class="section-title">التقارير المالية والكنترول</h2>
+        <h2 class="section-title">التقارير المالية</h2>
         <div class="grid-cards" id="report-summary-cards"></div>
         <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="generateFinancialReport('يومية')">تقرير يومي</button>
@@ -563,7 +593,7 @@
           <button class="btn btn-primary" onclick="generateFinancialReport('سنوي')">تقرير سنوي</button>
         </div>
         <div class="table-responsive">
-          <h3 style="padding:10px; color:var(--accent-color);">سجل رقابة المخرجات والمدخلات</h3>
+          <h3 style="padding:10px; color:var(--accent-color);">سجل المراجعة</h3>
           <table>
             <thead><tr><th>التاريخ</th><th>المستخدم</th><th>العملية</th><th>التفاصيل</th></tr></thead>
             <tbody id="audit-table-body"></tbody>
@@ -572,7 +602,7 @@
       </section>
 
       <section id="users" class="section-view">
-        <h2 class="section-title">إدارة المستخدمين والصلاحيات</h2>
+        <h2 class="section-title">إدارة المستخدمين</h2>
         <button class="btn btn-primary" onclick="openUserModal()">إضافة مستخدم جديد</button>
         <div class="table-responsive">
           <table>
@@ -586,7 +616,7 @@
         <h2 class="section-title">النسخ الاحتياطي</h2>
         <div class="grid-cards">
           <div class="card">
-            <h4>تصدير الشامل (Excel)</h4>
+            <h4>تصدير Excel</h4>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">تصدير جميع البيانات في ملف Excel واحد.</p>
             <button class="btn btn-success" onclick="exportToExcelBackup()">تصدير Excel</button>
           </div>
@@ -603,7 +633,7 @@
 
   <div id="print-area"></div>
 
-  <!-- ==================== نوافذ العملاء ==================== -->
+  <!-- ==================== باقي النوافذ ==================== -->
   
   <div id="customer-payment-modal" class="modal">
     <div class="modal-content">
@@ -647,7 +677,6 @@
     </div>
   </div>
 
-  <!-- باقي النوافذ (مختصرة) -->
   <div id="employee-modal" class="modal">
     <div class="modal-content">
       <h3>إضافة موظف جديد</h3>
@@ -756,12 +785,11 @@
 
   <div id="edit-sale-modal" class="modal">
     <div class="modal-content">
-      <h3>تعديل فاتورة مبيعات</h3>
+      <h3>تعديل فاتورة</h3>
       <form id="edit-sale-form">
         <input type="hidden" id="edit-sale-id">
         <div class="form-group"><label>العميل</label><input type="text" id="edit-sale-customer" class="form-control" required></div>
-        <div class="form-group"><label>رقم الهاتف</label><input type="text" id="edit-sale-phone" class="form-control"></div>
-        <div class="form-group"><label>طريقة الدفع</label><select id="edit-sale-pay-type" class="form-control"><option value="نقدي استلام الكاشير">نقدي</option><option value="محفظة">محفظة</option><option value="بنك انستا">بنك انستا</option><option value="تحويل بنكي آخر">تحويل بنكي</option><option value="آجل">آجل</option><option value="نقدي استلام المالك">نقدي - المالك</option></select></div>
+        <div class="form-group"><label>طريقة الدفع</label><select id="edit-sale-pay-type" class="form-control"><option value="نقدي">نقدي</option><option value="محفظة">محفظة</option><option value="بنك انستا">بنك انستا</option><option value="تحويل بنكي">تحويل بنكي</option><option value="آجل">آجل</option></select></div>
         <div class="form-group"><label>الخصم</label><input type="number" id="edit-sale-discount" class="form-control" value="0"></div>
         <div style="border:1px solid var(--border-color); border-radius:8px; padding:10px; margin-bottom:10px;">
           <label style="font-weight:600; color:var(--text-muted);">الأصناف:</label>
@@ -865,9 +893,9 @@
 
   <div id="transfer-modal" class="modal">
     <div class="modal-content">
-      <h3>تحويل بضائع - فرع اهالينا</h3>
+      <h3>تحويل بضائع</h3>
       <form id="transfer-form">
-        <div class="form-group"><label>نوع الحركة</label><select id="trans-type" class="form-control"><option value="إخراج إلى فرع اهالينا">إخراج إلى فرع اهالينا</option><option value="إدخال من فرع اهالينا">إدخال من فرع اهالينا</option></select></div>
+        <div class="form-group"><label>نوع الحركة</label><select id="trans-type" class="form-control"><option value="إخراج">إخراج بضاعة</option><option value="إدخال">إدخال بضاعة</option></select></div>
         <div class="form-group"><label>اسم الصنف</label><input type="text" id="trans-item" class="form-control" required></div>
         <div class="form-group"><label>الكمية</label><input type="number" id="trans-qty" class="form-control" required></div>
         <button type="submit" class="btn btn-success">تنفيذ</button>
@@ -933,7 +961,7 @@
     // محرك البيانات
     // ==========================================================================
     const DB_NAME = 'AbuSaud_ERP_DB';
-    const DB_VERSION = 9;
+    const DB_VERSION = 11;
     let dbInstance = null;
     let currentUser = null;
     let cart = [];
@@ -1124,7 +1152,7 @@
           <td>${p.name}</td>
           <td>${p.qty}</td>
           <td>${p.sellPrice}</td>
-          <td><button class="btn btn-primary" onclick="addToCart(${p.id})">+</button></td>
+          <td><button class="btn btn-primary btn-sm" onclick="addToCart(${p.id})">+</button></td>
         </tr>`;
       });
     }
@@ -1156,7 +1184,7 @@
           <td>${item.name}</td>
           <td>${item.qty}</td>
           <td>${sub}</td>
-          <td><button class="btn btn-danger" onclick="removeFromCart(${index})">x</button></td>
+          <td><button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">x</button></td>
         </tr>`;
       });
       const disc = parseFloat(document.getElementById('pos-discount').value) || 0;
@@ -1197,7 +1225,6 @@
       const payType = document.getElementById('pos-pay-type').value;
       const total = parseFloat(document.getElementById('pos-total').innerText);
       const customer = document.getElementById('pos-customer').value.trim() || 'عميل نقدي';
-      const phone = document.getElementById('pos-phone').value.trim() || '-';
       const discount = parseFloat(document.getElementById('pos-discount').value) || 0;
       const paid = parseFloat(document.getElementById('pos-paid').value) || 0;
       const remaining = Math.max(0, total - paid);
@@ -1205,7 +1232,6 @@
       const saleData = {
         date: new Date().toLocaleString('ar-EG'),
         customer: customer,
-        phone: phone,
         items: JSON.parse(JSON.stringify(cart)),
         total: total,
         discount: discount,
@@ -1218,7 +1244,6 @@
       await DataService.add('Sales', saleData);
       await logAudit('إصدار فاتورة مبيعات', `فاتورة بمبلغ ${total} - العميل: ${customer} - المدفوع: ${paid} - المتبقي: ${remaining}`);
 
-      // تحديث المخزون
       for (let item of cart) {
         if (typeof item.id === 'number') {
           const prod = await DataService.getById('Products', item.id);
@@ -1229,21 +1254,43 @@
         }
       }
 
-      // تسجيل دفعة العميل إذا كان آجل وتم دفع مبلغ
       if (payType === 'آجل' && paid > 0) {
         await DataService.add('CustomerPayments', {
           customer: customer,
-          phone: phone,
           amount: paid,
           method: 'نقدي',
-          desc: `دفعة على فاتورة #${Date.now()}`,
+          desc: `دفعة على فاتورة`,
           date: new Date().toLocaleString('ar-EG'),
           saleId: saleData.id
         });
       }
 
-      // طباعة الفاتورة
+      printInvoice(saleData, cart);
+      
+      cart = [];
+      updateCartUI();
+      document.getElementById('pos-customer').value = '';
+      document.getElementById('pos-discount').value = '0';
+      document.getElementById('pos-paid').value = '0';
+      renderInventory();
+      cancelNewSale();
+    }
+
+    // ==========================================================================
+    // طباعة الفاتورة
+    // ==========================================================================
+    function printInvoice(saleData, items) {
       const printArea = document.getElementById('print-area');
+      let itemsHtml = items.map((c, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${c.name}</td>
+          <td>${c.qty}</td>
+          <td>${c.price}</td>
+          <td>${c.price * c.qty}</td>
+        </tr>
+      `).join('');
+      
       printArea.innerHTML = `
         <div class="print-invoice">
           <div class="header">
@@ -1252,17 +1299,13 @@
             <p style="font-size:11px; color:#666;">رقم الفاتورة: #${Date.now().toString().slice(-6)}</p>
           </div>
           
-          <div class="info">
-            <div><strong>التاريخ:</strong> ${saleData.date}</div>
-            <div><strong>الكاشير:</strong> ${currentUser.username}</div>
+          <div class="info-line">
+            <span><strong>التاريخ:</strong> ${saleData.date}</span>
+            <span><strong>الكاشير:</strong> ${saleData.cashier}</span>
           </div>
-          <div class="info">
-            <div><strong>العميل:</strong> ${customer}</div>
-            <div><strong>الهاتف:</strong> ${phone}</div>
-          </div>
-          <div class="info">
-            <div><strong>طريقة الدفع:</strong> ${payType}</div>
-            <div><span class="badge-print">${payType === 'آجل' ? 'آجل' : 'نقدي'}</span></div>
+          <div class="info-line">
+            <span><strong>العميل:</strong> ${saleData.customer}</span>
+            <span><strong>طريقة الدفع:</strong> ${saleData.payType}</span>
           </div>
           
           <table>
@@ -1276,40 +1319,29 @@
               </tr>
             </thead>
             <tbody>
-              ${cart.map((c, i) => `<tr>
-                <td>${i + 1}</td>
-                <td>${c.name}</td>
-                <td>${c.qty}</td>
-                <td>${c.price}</td>
-                <td>${c.price * c.qty}</td>
-              </tr>`).join('')}
+              ${itemsHtml}
             </tbody>
           </table>
           
           <div class="total-section">
             <div class="total-line">
               <span>الإجمالي</span>
-              <strong>${total} ج.م</strong>
+              <strong>${saleData.total} ج.م</strong>
             </div>
-            ${payType === 'آجل' ? `
+            ${saleData.payType === 'آجل' ? `
               <div class="total-line paid">
                 <span>المدفوع</span>
-                <strong>${paid} ج.م</strong>
+                <strong>${saleData.paid} ج.م</strong>
               </div>
               <div class="total-line remaining">
                 <span>المتبقي</span>
-                <strong>${remaining} ج.م</strong>
+                <strong>${saleData.remaining} ج.م</strong>
               </div>
-              <div class="total-line total">
-                <span>المطلوب</span>
-                <strong>${total} ج.م</strong>
-              </div>
-            ` : `
-              <div class="total-line total">
-                <span>المطلوب</span>
-                <strong>${total} ج.م</strong>
-              </div>
-            `}
+            ` : ''}
+            <div class="total-line total">
+              <span>${saleData.payType === 'آجل' ? 'المطلوب' : 'الإجمالي'}</span>
+              <strong>${saleData.total} ج.م</strong>
+            </div>
           </div>
           
           <div class="footer">
@@ -1318,15 +1350,9 @@
           </div>
         </div>
       `;
+      
       window.print();
-      cart = [];
-      updateCartUI();
-      document.getElementById('pos-customer').value = '';
-      document.getElementById('pos-phone').value = '';
-      document.getElementById('pos-discount').value = '0';
-      document.getElementById('pos-paid').value = '0';
-      renderInventory();
-      cancelNewSale();
+      setTimeout(() => { printArea.innerHTML = ''; }, 500);
     }
 
     // ==========================================================================
@@ -1339,18 +1365,26 @@
           <td>${s.id}</td>
           <td>${s.date}</td>
           <td>${s.customer || 'عميل نقدي'}</td>
-          <td>${s.phone || '-'}</td>
           <td>${s.total} ج.م</td>
           <td>${s.paid || 0} ج.م</td>
-          <td style="color:${(s.remaining || 0) > 0 ? 'var(--danger-color)' : 'var(--success-color)'};">${s.remaining || 0} ج.م</td>
-          <td>${s.payType}</td>
+          <td style="color:${(s.remaining || 0) > 0 ? 'var(--danger-color)' : 'var(--success-color)'}; font-weight:bold;">${s.remaining || 0} ج.م</td>
+          <td><span class="badge ${s.payType === 'آجل' ? 'badge-warning' : 'badge-success'}">${s.payType}</span></td>
           <td>${s.cashier || '-'}</td>
           <td>
-            <button class="btn btn-warning" onclick="editSale(${s.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteSale(${s.id})">حذف</button>
+            <div class="actions-cell">
+              <button class="btn btn-warning btn-sm" onclick="editSale(${s.id})">تعديل</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteSale(${s.id})">حذف</button>
+              <button class="btn btn-info btn-sm" onclick="reprintSale(${s.id})">طباعة</button>
+            </div>
           </td>
         </tr>
       `).join('');
+    }
+
+    async function reprintSale(id) {
+      const sale = await DataService.getById('Sales', id);
+      if (!sale) return alert('الفاتورة غير موجودة!');
+      printInvoice(sale, sale.items || []);
     }
 
     // ==========================================================================
@@ -1367,8 +1401,7 @@
       
       document.getElementById('edit-sale-id').value = sale.id;
       document.getElementById('edit-sale-customer').value = sale.customer || '';
-      document.getElementById('edit-sale-phone').value = sale.phone || '';
-      document.getElementById('edit-sale-pay-type').value = sale.payType || 'نقدي استلام الكاشير';
+      document.getElementById('edit-sale-pay-type').value = sale.payType || 'نقدي';
       document.getElementById('edit-sale-discount').value = sale.discount || 0;
       
       editCartItems = JSON.parse(JSON.stringify(sale.items || []));
@@ -1390,7 +1423,7 @@
           <input type="number" class="edit-item-qty" value="${item.qty}" min="1" style="width:60px;" data-index="${index}">
           <label style="font-size:12px;">السعر:</label>
           <input type="number" class="edit-item-price" value="${item.price}" min="0" style="width:80px;" data-index="${index}">
-          <button class="btn btn-danger" style="padding:2px 8px; font-size:12px;" onclick="removeEditItem(${index})">×</button>
+          <button class="btn btn-danger btn-sm" onclick="removeEditItem(${index})">×</button>
         `;
         container.appendChild(div);
       });
@@ -1439,7 +1472,6 @@
       e.preventDefault();
       const id = parseInt(document.getElementById('edit-sale-id').value);
       const customer = document.getElementById('edit-sale-customer').value.trim() || 'عميل نقدي';
-      const phone = document.getElementById('edit-sale-phone').value.trim() || '-';
       const payType = document.getElementById('edit-sale-pay-type').value;
       const discount = parseFloat(document.getElementById('edit-sale-discount').value) || 0;
       
@@ -1470,7 +1502,6 @@
         }
       }
       
-      // الاحتفاظ بقيم المدفوع والمتبقي من الفاتورة القديمة
       const paid = oldSale ? oldSale.paid || 0 : 0;
       const remaining = Math.max(0, finalTotal - paid);
       
@@ -1478,7 +1509,6 @@
         id: id,
         date: oldSale ? oldSale.date : new Date().toLocaleString('ar-EG'),
         customer: customer,
-        phone: phone,
         items: editCartItems,
         total: finalTotal,
         discount: discount,
@@ -1533,11 +1563,10 @@
       const customersMap = {};
       sales.forEach(s => {
         if (s.payType === 'آجل' || (s.remaining && s.remaining > 0)) {
-          const key = s.customer + '|' + s.phone;
+          const key = s.customer;
           if (!customersMap[key]) {
             customersMap[key] = {
               name: s.customer,
-              phone: s.phone || '-',
               totalSales: 0,
               totalPaid: 0,
               count: 0
@@ -1550,19 +1579,8 @@
       });
       
       payments.forEach(p => {
-        const key = p.customer + '|' + p.phone;
+        const key = p.customer;
         if (customersMap[key]) {
-          customersMap[key].totalPaid += p.amount || 0;
-        } else {
-          if (!customersMap[key]) {
-            customersMap[key] = {
-              name: p.customer,
-              phone: p.phone || '-',
-              totalSales: 0,
-              totalPaid: 0,
-              count: 0
-            };
-          }
           customersMap[key].totalPaid += p.amount || 0;
         }
       });
@@ -1574,32 +1592,141 @@
         return `<tr>
           <td>${index + 1}</td>
           <td><span class="customer-badge">${c.name}</span></td>
-          <td>${c.phone}</td>
           <td>${c.totalSales} ج.م</td>
           <td>${c.totalPaid} ج.م</td>
           <td style="color:${remaining > 0 ? 'var(--danger-color)' : 'var(--success-color)'}; font-weight:bold;">${remaining} ج.م</td>
           <td>${c.count}</td>
           <td>
-            <button class="btn btn-info" onclick="showCustomerStatement('${c.name}', '${c.phone}')">كشف حساب</button>
+            <button class="btn btn-info btn-sm" onclick="showCustomerStatement('${c.name}')">كشف حساب</button>
           </td>
         </tr>`;
       }).join('');
     }
 
     // ==========================================================================
-    // عرض كشف حساب العميل
+    // تصدير كشف العملاء إلى Excel
     // ==========================================================================
-    async function showCustomerStatement(name, phone) {
+    async function exportCustomersToExcel() {
       const sales = await DataService.getAll('Sales');
       const payments = await DataService.getAll('CustomerPayments');
       
-      const customerSales = sales.filter(s => s.customer === name && s.phone === phone);
-      const customerPayments = payments.filter(p => p.customer === name && p.phone === phone);
+      const customersMap = {};
+      sales.forEach(s => {
+        if (s.payType === 'آجل' || (s.remaining && s.remaining > 0)) {
+          const key = s.customer;
+          if (!customersMap[key]) {
+            customersMap[key] = {
+              name: s.customer,
+              totalSales: 0,
+              totalPaid: 0,
+              count: 0,
+              sales: []
+            };
+          }
+          customersMap[key].totalSales += s.total || 0;
+          customersMap[key].totalPaid += s.paid || 0;
+          customersMap[key].count++;
+          customersMap[key].sales.push({
+            date: s.date,
+            total: s.total,
+            paid: s.paid,
+            remaining: s.remaining,
+            payType: s.payType
+          });
+        }
+      });
+      
+      payments.forEach(p => {
+        const key = p.customer;
+        if (customersMap[key]) {
+          customersMap[key].totalPaid += p.amount || 0;
+        }
+      });
+      
+      const customers = Object.values(customersMap);
+      
+      if (customers.length === 0) {
+        return alert('لا يوجد عملاء آجل لتصديرهم!');
+      }
+      
+      // إعداد البيانات للتصدير
+      const excelData = [];
+      customers.forEach((c, index) => {
+        const remaining = c.totalSales - c.totalPaid;
+        excelData.push({
+          '#': index + 1,
+          'اسم العميل': c.name,
+          'إجمالي المشتريات': c.totalSales,
+          'إجمالي المدفوع': c.totalPaid,
+          'المتبقي': remaining,
+          'عدد الفواتير': c.count
+        });
+        // إضافة تفاصيل الفواتير لكل عميل
+        c.sales.forEach(s => {
+          excelData.push({
+            '#': '',
+            'اسم العميل': `  └─ فاتورة`,
+            'إجمالي المشتريات': s.total,
+            'إجمالي المدفوع': s.paid,
+            'المتبقي': s.remaining,
+            'عدد الفواتير': s.date
+          });
+        });
+        // إضافة سطر فارغ بين العملاء
+        excelData.push({
+          '#': '',
+          'اسم العميل': '---',
+          'إجمالي المشتريات': '',
+          'إجمالي المدفوع': '',
+          'المتبقي': '',
+          'عدد الفواتير': ''
+        });
+      });
+      
+      // إضافة إجمالي المستحق
+      const totalRemaining = customers.reduce((sum, c) => sum + (c.totalSales - c.totalPaid), 0);
+      excelData.push({
+        '#': '',
+        'اسم العميل': 'إجمالي المستحق على العملاء',
+        'إجمالي المشتريات': '',
+        'إجمالي المدفوع': '',
+        'المتبقي': totalRemaining,
+        'عدد الفواتير': ''
+      });
+      
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      
+      // تعيين عرض الأعمدة
+      ws['!cols'] = [
+        { wch: 5 },
+        { wch: 25 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 15 }
+      ];
+      
+      XLSX.utils.book_append_sheet(wb, ws, 'كشوف العملاء');
+      XLSX.writeFile(wb, `كشوف_عملاء_الآجل_${new Date().toISOString().slice(0,10)}.xlsx`);
+      
+      await logAudit('تصدير كشوف عملاء', 'تم تصدير كشوف عملاء الآجل إلى Excel');
+      alert('تم تصدير كشوف العملاء بنجاح!');
+    }
+
+    // ==========================================================================
+    // عرض كشف حساب العميل
+    // ==========================================================================
+    async function showCustomerStatement(name) {
+      const sales = await DataService.getAll('Sales');
+      const payments = await DataService.getAll('CustomerPayments');
+      
+      const customerSales = sales.filter(s => s.customer === name);
+      const customerPayments = payments.filter(p => p.customer === name);
       
       let html = `
         <div style="margin-bottom:15px;">
           <h4 style="color:var(--accent-color);">${name}</h4>
-          <p>الهاتف: ${phone}</p>
           <hr>
         </div>
         <table>
@@ -1657,7 +1784,7 @@
       document.getElementById('customer-statement-content').innerHTML = html;
       document.getElementById('customer-statement-modal').classList.add('active');
       
-      window._statementData = { name, phone, customerSales, customerPayments, totalSales, totalPaid, remaining };
+      window._statementData = { name, customerSales, customerPayments, totalSales, totalPaid, remaining };
     }
 
     function printCustomerStatement() {
@@ -1682,7 +1809,6 @@
           </div>
           <div style="margin-bottom:15px;">
             <h4>${data.name}</h4>
-            <p>الهاتف: ${data.phone}</p>
           </div>
           <table>
             <thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>البيان</th></tr></thead>
@@ -1699,6 +1825,7 @@
         </div>
       `;
       window.print();
+      setTimeout(() => { printArea.innerHTML = ''; }, 500);
     }
 
     // ==========================================================================
@@ -1709,15 +1836,14 @@
       const customers = {};
       sales.forEach(s => {
         if (s.customer && s.customer !== 'عميل نقدي') {
-          const key = s.customer + '|' + (s.phone || '-');
-          customers[key] = { name: s.customer, phone: s.phone || '-' };
+          customers[s.customer] = s.customer;
         }
       });
       
       const sel = document.getElementById('cust-pay-customer');
       sel.innerHTML = '<option value="">-- اختر عميل --</option>';
-      Object.values(customers).forEach(c => {
-        sel.innerHTML += `<option value="${c.name}|${c.phone}">${c.name} (${c.phone})</option>`;
+      Object.keys(customers).forEach(c => {
+        sel.innerHTML += `<option value="${c}">${c}</option>`;
       });
       
       document.getElementById('customer-payment-modal').classList.add('active');
@@ -1725,9 +1851,8 @@
 
     document.getElementById('customer-payment-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const value = document.getElementById('cust-pay-customer').value;
-      if (!value) return alert('يرجى اختيار عميل!');
-      const [name, phone] = value.split('|');
+      const customer = document.getElementById('cust-pay-customer').value;
+      if (!customer) return alert('يرجى اختيار عميل!');
       const amount = parseFloat(document.getElementById('cust-pay-amount').value);
       const method = document.getElementById('cust-pay-method').value;
       const desc = document.getElementById('cust-pay-desc').value || 'دفعة';
@@ -1735,19 +1860,17 @@
       if (!amount || amount <= 0) return alert('يرجى إدخال مبلغ صحيح!');
       
       await DataService.add('CustomerPayments', {
-        customer: name,
-        phone: phone,
+        customer: customer,
         amount: amount,
         method: method,
         desc: desc,
         date: new Date().toLocaleString('ar-EG')
       });
       
-      // تحديث المدفوعات في الفواتير المفتوحة (أولاً بأول)
       const sales = await DataService.getAll('Sales');
       let remainingAmount = amount;
       const customerSales = sales
-        .filter(s => s.customer === name && s.phone === phone && (s.remaining || 0) > 0)
+        .filter(s => s.customer === customer && (s.remaining || 0) > 0)
         .sort((a, b) => new Date(a.date) - new Date(b.date));
       
       for (let sale of customerSales) {
@@ -1764,7 +1887,7 @@
       document.getElementById('customer-payment-form').reset();
       renderCustomers();
       renderSales();
-      await logAudit('تسجيل دفعة عميل', `دفعة بمبلغ ${amount} من العميل: ${name}`);
+      await logAudit('تسجيل دفعة عميل', `دفعة بمبلغ ${amount} من العميل: ${customer}`);
       alert('تم تسجيل الدفعة بنجاح!');
     });
 
@@ -1778,19 +1901,17 @@
       const customersMap = {};
       sales.forEach(s => {
         if (s.payType === 'آجل' || (s.remaining && s.remaining > 0)) {
-          const key = s.customer + '|' + s.phone;
-          if (!customersMap[key]) {
-            customersMap[key] = { name: s.customer, phone: s.phone || '-', totalSales: 0, totalPaid: 0 };
+          if (!customersMap[s.customer]) {
+            customersMap[s.customer] = { name: s.customer, totalSales: 0, totalPaid: 0 };
           }
-          customersMap[key].totalSales += s.total || 0;
-          customersMap[key].totalPaid += s.paid || 0;
+          customersMap[s.customer].totalSales += s.total || 0;
+          customersMap[s.customer].totalPaid += s.paid || 0;
         }
       });
       
       payments.forEach(p => {
-        const key = p.customer + '|' + p.phone;
-        if (customersMap[key]) {
-          customersMap[key].totalPaid += p.amount || 0;
+        if (customersMap[p.customer]) {
+          customersMap[p.customer].totalPaid += p.amount || 0;
         }
       });
       
@@ -1804,7 +1925,6 @@
         return `<tr>
           <td>${i+1}</td>
           <td>${c.name}</td>
-          <td>${c.phone}</td>
           <td>${c.totalSales} ج.م</td>
           <td>${c.totalPaid} ج.م</td>
           <td style="color:${remaining > 0 ? '#dc3545' : '#28a745'}; font-weight:bold;">${remaining} ج.م</td>
@@ -1822,11 +1942,11 @@
             <p>التاريخ: ${new Date().toLocaleString('ar-EG')}</p>
           </div>
           <table>
-            <thead><tr><th>#</th><th>اسم العميل</th><th>الهاتف</th><th>إجمالي المشتريات</th><th>إجمالي المدفوع</th><th>المتبقي</th></tr></thead>
+            <thead><tr><th>#</th><th>اسم العميل</th><th>إجمالي المشتريات</th><th>إجمالي المدفوع</th><th>المتبقي</th></tr></thead>
             <tbody>${tableRows}</tbody>
             <tfoot>
               <tr class="total-row">
-                <td colspan="5" style="text-align:left;">إجمالي المستحق على العملاء</td>
+                <td colspan="4" style="text-align:left;">إجمالي المستحق على العملاء</td>
                 <td style="font-size:1.2rem;">${totalRemaining} ج.م</td>
               </tr>
             </tfoot>
@@ -1837,6 +1957,7 @@
         </div>
       `;
       window.print();
+      setTimeout(() => { printArea.innerHTML = ''; }, 500);
     }
 
     // ==========================================================================
@@ -2075,8 +2196,8 @@
           <td style="color:var(--danger-color);">${(salary.totalBaseDeductions + salary.extraDeductions).toFixed(2)} ج.م</td>
           <td style="font-weight:bold; color:var(--accent-color);">${salary.netSalary.toFixed(2)} ج.م</td>
           <td>
-            <button class="btn btn-warning" onclick="editEmployee(${e.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteEmployee(${e.id})">حذف</button>
+            <button class="btn btn-warning btn-sm" onclick="editEmployee(${e.id})">تعديل</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteEmployee(${e.id})">حذف</button>
           </td>
         </tr>`;
       }).join('');
@@ -2096,7 +2217,7 @@
           <td><span class="badge ${badgeClass}">${t.type}${t.subType ? ' - ' + t.subType : ''}</span></td>
           <td style="color:var(--danger-color);">${t.amount || 0} ج.م${t.days ? ' (' + t.days + ' يوم)' : ''}</td>
           <td>${t.desc || ''}</td>
-          <td><button class="btn btn-danger" onclick="deleteEmployeeTransaction(${t.id})">حذف</button></td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteEmployeeTransaction(${t.id})">حذف</button></td>
         </tr>`;
       }).join('');
     }
@@ -2158,6 +2279,7 @@
         </div>
       `;
       window.print();
+      setTimeout(() => { printArea.innerHTML = ''; }, 500);
     }
 
     // ==========================================================================
@@ -2364,8 +2486,8 @@
       const list = await DataService.getAll('Products');
       document.getElementById('inventory-table-body').innerHTML = list.map(p => `
         <tr><td>${p.code}</td><td>${p.name}</td><td>${p.qty}</td><td>${p.buyPrice}</td><td>${p.sellPrice}</td>
-        <td><button class="btn btn-warning" onclick="editProduct(${p.id})">تعديل</button>
-        <button class="btn btn-danger" onclick="deleteItem('Products', ${p.id})">حذف</button></td></tr>
+        <td><button class="btn btn-warning btn-sm" onclick="editProduct(${p.id})">تعديل</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('Products', ${p.id})">حذف</button></td></tr>
       `).join('');
     }
 
@@ -2374,8 +2496,8 @@
       document.getElementById('purchases-table-body').innerHTML = list.map(p => `
         <tr><td>${p.id}</td><td>${p.date}</td><td>${p.supplier}</td><td>${p.payType}</td>
         <td>${p.paid}</td><td>${p.remaining}</td><td>${p.total}</td>
-        <td><button class="btn btn-warning" onclick="editPurchase(${p.id})">تعديل</button>
-        <button class="btn btn-danger" onclick="deleteItem('Purchases', ${p.id})">حذف</button></td></tr>
+        <td><button class="btn btn-warning btn-sm" onclick="editPurchase(${p.id})">تعديل</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('Purchases', ${p.id})">حذف</button></td></tr>
       `).join('');
     }
 
@@ -2383,8 +2505,8 @@
       const list = await DataService.getAll('Expenses');
       document.getElementById('expenses-table-body').innerHTML = list.map(x => `
         <tr><td>${x.date}</td><td>${x.cat}</td><td>${x.amount}</td><td>${x.desc}</td>
-        <td><button class="btn btn-warning" onclick="editExpense(${x.id})">تعديل</button>
-        <button class="btn btn-danger" onclick="deleteItem('Expenses', ${x.id})">حذف</button></td></tr>
+        <td><button class="btn btn-warning btn-sm" onclick="editExpense(${x.id})">تعديل</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('Expenses', ${x.id})">حذف</button></td></tr>
       `).join('');
     }
 
@@ -2392,8 +2514,8 @@
       const list = await DataService.getAll('Assets');
       document.getElementById('assets-table-body').innerHTML = list.map(a => `
         <tr><td>${a.type}</td><td>${a.desc}</td><td>${a.value} ج.م</td>
-        <td><button class="btn btn-warning" onclick="editAsset(${a.id})">تعديل</button>
-        <button class="btn btn-danger" onclick="deleteItem('Assets', ${a.id})">حذف</button></td></tr>
+        <td><button class="btn btn-warning btn-sm" onclick="editAsset(${a.id})">تعديل</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('Assets', ${a.id})">حذف</button></td></tr>
       `).join('');
     }
 
