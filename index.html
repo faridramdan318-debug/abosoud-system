@@ -173,16 +173,105 @@
     .pos-products, .pos-cart { background: #ffffff; padding: 1rem; border-radius: 12px; display: flex; flex-direction: column; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .cart-items { flex: 1; overflow-y: auto; margin: 0.8rem 0; }
 
+    /* أنماط الطباعة */
     @media print {
       body * { visibility: hidden; }
       #print-area, #print-area * { visibility: visible; }
-      #print-area { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; padding: 20px; }
-      .print-report { max-width: 100%; }
-      .print-report table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-      .print-report th, .print-report td { border: 1px solid #000; padding: 6px; text-align: right; }
-      .print-report h1, .print-report h2, .print-report h3 { text-align: center; }
-      .print-report .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-      .print-report .total-row { font-weight: bold; background: #f0f0f0; }
+      #print-area { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100%; 
+        color: #000; 
+        background: #fff; 
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .print-invoice { 
+        max-width: 80mm; 
+        margin: 0 auto;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .print-invoice .header { 
+        text-align: center; 
+        border-bottom: 2px solid #c9a84c; 
+        padding-bottom: 10px; 
+        margin-bottom: 10px;
+      }
+      .print-invoice .header h1 { 
+        color: #c9a84c;
+        font-size: 20px;
+        margin: 0;
+      }
+      .print-invoice .header p { 
+        font-size: 12px; 
+        color: #666;
+        margin: 2px 0;
+      }
+      .print-invoice .info { 
+        display: flex; 
+        justify-content: space-between; 
+        font-size: 12px;
+        margin-bottom: 10px;
+        padding: 5px 0;
+        border-bottom: 1px dashed #ddd;
+      }
+      .print-invoice table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        margin-top: 10px;
+        font-size: 12px;
+      }
+      .print-invoice th, .print-invoice td { 
+        border: 1px solid #000; 
+        padding: 5px 8px; 
+        text-align: center;
+      }
+      .print-invoice th { 
+        background: #f5f0e0;
+        font-weight: bold;
+      }
+      .print-invoice .total-section {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 2px solid #c9a84c;
+      }
+      .print-invoice .total-line {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        padding: 3px 0;
+      }
+      .print-invoice .total-line strong { font-weight: bold; }
+      .print-invoice .total-line.total { 
+        font-size: 16px; 
+        font-weight: bold;
+        color: #c9a84c;
+        border-top: 1px solid #ddd;
+        padding-top: 5px;
+        margin-top: 5px;
+      }
+      .print-invoice .total-line.paid { color: #28a745; }
+      .print-invoice .total-line.remaining { color: #dc3545; }
+      .print-invoice .footer {
+        text-align: center;
+        font-size: 10px;
+        color: #999;
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px dashed #ddd;
+      }
+      .print-invoice .badge-print {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: bold;
+        color: #fff;
+        background: #c9a84c;
+      }
     }
 
     .brand-title {
@@ -199,14 +288,22 @@
       padding-bottom: 0.5rem;
       margin-bottom: 1rem;
     }
-    .salary-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .salary-details .deductions { border-right: 3px solid var(--danger-color); padding-right: 10px; }
-    .salary-details .allowances { border-right: 3px solid var(--success-color); padding-right: 10px; }
     .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; }
     .badge-success { background: #d4edda; color: #155724; }
     .badge-danger { background: #f8d7da; color: #721c24; }
     .badge-warning { background: #fff3cd; color: #856404; }
     .badge-info { background: #d1ecf1; color: #0c5460; }
+    .badge-secondary { background: #e2e3e5; color: #383d41; }
+    
+    .customer-badge { 
+      display: inline-block; 
+      padding: 4px 12px; 
+      border-radius: 20px; 
+      font-size: 0.8rem; 
+      font-weight: 600;
+      background: var(--gold-gradient);
+      color: #1a1a2e;
+    }
   </style>
 </head>
 <body>
@@ -236,6 +333,7 @@
     <ul class="sidebar-nav">
       <li><a data-target="dashboard" class="nav-link active">الرئيسية</a></li>
       <li><a data-target="sales" class="nav-link">المبيعات والفاتورة</a></li>
+      <li><a data-target="customers" class="nav-link">كشوف عملاء الآجل</a></li>
       <li><a data-target="purchases" class="nav-link">المشتريات</a></li>
       <li><a data-target="inventory" class="nav-link">المخازن</a></li>
       <li><a data-target="employees" class="nav-link">الأجور والرواتب</a></li>
@@ -269,7 +367,7 @@
         <div id="sales-list-container">
           <div class="table-responsive">
             <table>
-              <thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>الهاتف</th><th>الإجمالي</th><th>طريقة الدفع</th><th>الكاشير</th><th>تحكم</th></tr></thead>
+              <thead><tr><th>#</th><th>التاريخ</th><th>العميل</th><th>الهاتف</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>طريقة الدفع</th><th>الكاشير</th><th>تحكم</th></tr></thead>
               <tbody id="sales-table-body"></tbody>
             </table>
           </div>
@@ -298,6 +396,10 @@
                 <label>رقم الهاتف</label>
                 <input type="text" id="pos-phone" class="form-control" placeholder="رقم هاتف العميل">
               </div>
+              <div class="form-group">
+                <label>المبلغ المدفوع (للآجل)</label>
+                <input type="number" id="pos-paid" class="form-control" value="0" placeholder="المبلغ المدفوع الآن" oninput="updateCartUI()">
+              </div>
               <div class="cart-items">
                 <table>
                   <thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>حذف</th></tr></thead>
@@ -306,6 +408,8 @@
               </div>
               <div class="cart-summary">
                 <div style="font-weight:bold; font-size:1.1rem;">الإجمالي: <span id="pos-total" style="color:var(--accent-color);">0</span> ج.م</div>
+                <div style="font-weight:bold; font-size:1rem; color:var(--success-color);">المدفوع: <span id="pos-paid-display">0</span> ج.م</div>
+                <div style="font-weight:bold; font-size:1rem; color:var(--danger-color);">المتبقي: <span id="pos-remaining-display">0</span> ج.م</div>
                 <div class="form-group">
                   <label>الخصم</label>
                   <input type="number" id="pos-discount" class="form-control" value="0" onchange="updateCartUI()">
@@ -325,6 +429,40 @@
                 <button class="btn btn-danger" style="width:100%; margin-top:5px;" onclick="cancelNewSale()">إلغاء الفاتورة</button>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="customers" class="section-view">
+        <h2 class="section-title">كشوف عملاء الآجل</h2>
+        <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="openCustomerPaymentModal()">تسجيل دفعة من عميل</button>
+          <button class="btn btn-success" onclick="printCustomersReport()">طباعة كشف العملاء</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>اسم العميل</th>
+                <th>الهاتف</th>
+                <th>إجمالي المشتريات</th>
+                <th>إجمالي المدفوع</th>
+                <th>المتبقي</th>
+                <th>عدد الفواتير</th>
+                <th>تحكم</th>
+              </tr>
+            </thead>
+            <tbody id="customers-table-body"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:20px;">
+          <h3 class="section-title">سجل مدفوعات العملاء</h3>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>البيان</th><th>تحكم</th></tr></thead>
+              <tbody id="customer-payments-body"></tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -382,7 +520,6 @@
             <tbody id="employees-table-body"></tbody>
           </table>
         </div>
-        <!-- سجل الخصومات والغياب والمصروفات -->
         <div style="margin-top:20px;">
           <h3 class="section-title">سجل الخصومات والغياب والمصروفات</h3>
           <div class="table-responsive">
@@ -466,165 +603,157 @@
 
   <div id="print-area"></div>
 
-  <!-- ==================== نوافذ الموظفين ==================== -->
+  <!-- ==================== نوافذ العملاء ==================== -->
+  
+  <div id="customer-payment-modal" class="modal">
+    <div class="modal-content">
+      <h3>تسجيل دفعة من عميل</h3>
+      <form id="customer-payment-form">
+        <div class="form-group">
+          <label>اختيار العميل</label>
+          <select id="cust-pay-customer" class="form-control" required>
+            <option value="">-- اختر عميل --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>المبلغ المدفوع</label>
+          <input type="number" id="cust-pay-amount" class="form-control" required min="0.01" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>طريقة الدفع</label>
+          <select id="cust-pay-method" class="form-control">
+            <option value="نقدي">نقدي</option>
+            <option value="تحويل بنكي">تحويل بنكي</option>
+            <option value="محفظة">محفظة</option>
+            <option value="شيك">شيك</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>البيان</label>
+          <input type="text" id="cust-pay-desc" class="form-control" placeholder="تفاصيل الدفعة">
+        </div>
+        <button type="submit" class="btn btn-success">تسجيل الدفعة</button>
+        <button type="button" class="btn btn-danger" onclick="closeModal('customer-payment-modal')">إلغاء</button>
+      </form>
+    </div>
+  </div>
 
-  <!-- نافذة إضافة موظف -->
+  <div id="customer-statement-modal" class="modal">
+    <div class="modal-content">
+      <h3>كشف حساب العميل</h3>
+      <div id="customer-statement-content"></div>
+      <button class="btn btn-primary" onclick="printCustomerStatement()">طباعة الكشف</button>
+      <button class="btn btn-danger" onclick="closeModal('customer-statement-modal')">إغلاق</button>
+    </div>
+  </div>
+
+  <!-- باقي النوافذ (مختصرة) -->
   <div id="employee-modal" class="modal">
     <div class="modal-content">
       <h3>إضافة موظف جديد</h3>
       <form id="employee-form">
         <div class="form-group"><label>اسم العامل</label><input type="text" id="emp-name" class="form-control" required></div>
         <div class="form-group"><label>تاريخ التعيين</label><input type="date" id="emp-date" class="form-control" required></div>
-        <div class="form-group"><label>الراتب الأساسي (شهري)</label><input type="number" id="emp-salary" class="form-control" required></div>
+        <div class="form-group"><label>الراتب الأساسي</label><input type="number" id="emp-salary" class="form-control" required></div>
         <button type="submit" class="btn btn-success">حفظ</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('employee-modal')">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- نافذة تعديل الموظف -->
   <div id="edit-employee-modal" class="modal">
     <div class="modal-content">
-      <h3>تعديل بيانات موظف - تفاصيل الراتب</h3>
+      <h3>تعديل بيانات موظف</h3>
       <form id="edit-employee-form">
         <input type="hidden" id="edit-emp-id">
         <div class="form-group"><label>اسم العامل</label><input type="text" id="edit-emp-name" class="form-control" required></div>
         <div class="form-group"><label>تاريخ التعيين</label><input type="date" id="edit-emp-date" class="form-control" required></div>
         <div class="form-group"><label>الراتب الأساسي</label><input type="number" id="edit-emp-salary" class="form-control" required></div>
-        
-        <div class="salary-details">
-          <div class="allowances">
-            <h4 style="color:var(--success-color); font-size:0.95rem;">البدلات والإضافات</h4>
+        <div class="salary-details" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <h4 style="color:var(--success-color);">البدلات</h4>
             <div class="form-group"><label>بدل انتقال</label><input type="number" id="edit-emp-transport" class="form-control" value="0"></div>
             <div class="form-group"><label>بدل سكن</label><input type="number" id="edit-emp-housing" class="form-control" value="0"></div>
             <div class="form-group"><label>مكافأة</label><input type="number" id="edit-emp-bonus" class="form-control" value="0"></div>
             <div class="form-group"><label>عمولة</label><input type="number" id="edit-emp-commission" class="form-control" value="0"></div>
             <div class="form-group"><label>بدلات أخرى</label><input type="number" id="edit-emp-other-allowance" class="form-control" value="0"></div>
           </div>
-          <div class="deductions">
-            <h4 style="color:var(--danger-color); font-size:0.95rem;">الخصومات الأساسية</h4>
+          <div>
+            <h4 style="color:var(--danger-color);">الخصومات</h4>
             <div class="form-group"><label>تأمينات</label><input type="number" id="edit-emp-insurance" class="form-control" value="0"></div>
             <div class="form-group"><label>خصم ثابت</label><input type="number" id="edit-emp-fixed-deduction" class="form-control" value="0"></div>
           </div>
         </div>
-        
         <div style="background:var(--bg-secondary); padding:15px; border-radius:8px; margin:10px 0;">
           <h4 style="color:var(--accent-color);">ملخص الراتب</h4>
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:10px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
             <div><strong>إجمالي البدلات:</strong> <span id="edit-total-allowances">0</span> ج.م</div>
-            <div><strong>الخصومات الأساسية:</strong> <span id="edit-total-deductions">0</span> ج.م</div>
+            <div><strong>الخصومات:</strong> <span id="edit-total-deductions">0</span> ج.م</div>
             <div><strong style="color:var(--accent-color);">صافي الراتب:</strong> <span id="edit-net-salary">0</span> ج.م</div>
           </div>
         </div>
-        
-        <button type="submit" class="btn btn-success">تحديث الموظف</button>
+        <button type="submit" class="btn btn-success">تحديث</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('edit-employee-modal')">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- نافذة تسجيل سلفة -->
   <div id="advance-modal" class="modal">
     <div class="modal-content">
       <h3>تسجيل سلفة موظف</h3>
       <form id="advance-form">
-        <div class="form-group">
-          <label>الموظف</label>
-          <select id="adv-emp-id" class="form-control" required></select>
-        </div>
-        <div class="form-group"><label>مبلغ السلفة</label><input type="number" id="adv-amount" class="form-control" required></div>
-        <div class="form-group"><label>البيان (اختياري)</label><input type="text" id="adv-desc" class="form-control" placeholder="سبب السلفة"></div>
+        <div class="form-group"><label>الموظف</label><select id="adv-emp-id" class="form-control" required></select></div>
+        <div class="form-group"><label>المبلغ</label><input type="number" id="adv-amount" class="form-control" required></div>
+        <div class="form-group"><label>البيان</label><input type="text" id="adv-desc" class="form-control" placeholder="سبب السلفة"></div>
         <button type="submit" class="btn btn-success">تسجيل</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('advance-modal')">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- نافذة تسجيل خصم -->
   <div id="deduction-modal" class="modal">
     <div class="modal-content">
       <h3>تسجيل خصم للموظف</h3>
       <form id="deduction-form">
-        <div class="form-group">
-          <label>الموظف</label>
-          <select id="ded-emp-id" class="form-control" required></select>
-        </div>
-        <div class="form-group"><label>مبلغ الخصم</label><input type="number" id="ded-amount" class="form-control" required></div>
-        <div class="form-group"><label>سبب الخصم</label>
-          <select id="ded-type" class="form-control" required>
-            <option value="مخالفة">مخالفة</option>
-            <option value="تأخير">تأخير</option>
-            <option value="تلفيات">تلفيات</option>
-            <option value="خصم أدوات">خصم أدوات</option>
-            <option value="خصم آخر">خصم آخر</option>
-          </select>
-        </div>
-        <div class="form-group"><label>البيان</label><input type="text" id="ded-desc" class="form-control" placeholder="تفاصيل الخصم"></div>
-        <button type="submit" class="btn btn-danger">تسجيل الخصم</button>
+        <div class="form-group"><label>الموظف</label><select id="ded-emp-id" class="form-control" required></select></div>
+        <div class="form-group"><label>المبلغ</label><input type="number" id="ded-amount" class="form-control" required></div>
+        <div class="form-group"><label>نوع الخصم</label><select id="ded-type" class="form-control"><option value="مخالفة">مخالفة</option><option value="تأخير">تأخير</option><option value="تلفيات">تلفيات</option><option value="خصم أدوات">خصم أدوات</option><option value="خصم آخر">خصم آخر</option></select></div>
+        <div class="form-group"><label>البيان</label><input type="text" id="ded-desc" class="form-control"></div>
+        <button type="submit" class="btn btn-danger">تسجيل</button>
         <button type="button" class="btn btn-secondary" onclick="closeModal('deduction-modal')">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- نافذة تسجيل غياب -->
   <div id="absence-modal" class="modal">
     <div class="modal-content">
       <h3>تسجيل غياب للموظف</h3>
       <form id="absence-form">
-        <div class="form-group">
-          <label>الموظف</label>
-          <select id="abs-emp-id" class="form-control" required></select>
-        </div>
+        <div class="form-group"><label>الموظف</label><select id="abs-emp-id" class="form-control" required></select></div>
         <div class="form-group"><label>عدد أيام الغياب</label><input type="number" id="abs-days" class="form-control" required min="1"></div>
-        <div class="form-group"><label>قيمة اليومية (تحسب تلقائياً)</label>
-          <input type="number" id="abs-daily-rate" class="form-control" readonly style="background:#f0f0f0;">
-        </div>
-        <div class="form-group"><label>إجمالي خصم الغياب</label>
-          <input type="number" id="abs-total" class="form-control" readonly style="background:#f0f0f0;">
-        </div>
-        <div class="form-group"><label>سبب الغياب</label>
-          <select id="abs-reason" class="form-control">
-            <option value="مرضي">مرضي</option>
-            <option value="إجازة بدون أذن">إجازة بدون أذن</option>
-            <option value="تأخير متكرر">تأخير متكرر</option>
-            <option value="أسباب شخصية">أسباب شخصية</option>
-            <option value="أخرى">أخرى</option>
-          </select>
-        </div>
-        <button type="submit" class="btn btn-warning">تسجيل الغياب</button>
+        <div class="form-group"><label>قيمة اليومية</label><input type="number" id="abs-daily-rate" class="form-control" readonly style="background:#f0f0f0;"></div>
+        <div class="form-group"><label>إجمالي الخصم</label><input type="number" id="abs-total" class="form-control" readonly style="background:#f0f0f0;"></div>
+        <div class="form-group"><label>سبب الغياب</label><select id="abs-reason" class="form-control"><option value="مرضي">مرضي</option><option value="إجازة بدون أذن">إجازة بدون أذن</option><option value="تأخير متكرر">تأخير متكرر</option><option value="أخرى">أخرى</option></select></div>
+        <button type="submit" class="btn btn-warning">تسجيل</button>
         <button type="button" class="btn btn-secondary" onclick="closeModal('absence-modal')">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- نافذة تسجيل مصروف موظف -->
   <div id="employee-expense-modal" class="modal">
     <div class="modal-content">
       <h3>تسجيل مصروف على الموظف</h3>
       <form id="employee-expense-form">
-        <div class="form-group">
-          <label>الموظف</label>
-          <select id="exp-emp-id" class="form-control" required></select>
-        </div>
+        <div class="form-group"><label>الموظف</label><select id="exp-emp-id" class="form-control" required></select></div>
         <div class="form-group"><label>المبلغ</label><input type="number" id="exp-emp-amount" class="form-control" required></div>
-        <div class="form-group"><label>نوع المصروف</label>
-          <select id="exp-emp-type" class="form-control" required>
-            <option value="أدوات عمل">أدوات عمل</option>
-            <option value="ملابس عمل">ملابس عمل</option>
-            <option value="مواصلات">مواصلات</option>
-            <option value="وجبات">وجبات</option>
-            <option value="مصروف شخصي">مصروف شخصي</option>
-            <option value="أخرى">أخرى</option>
-          </select>
-        </div>
-        <div class="form-group"><label>البيان</label><input type="text" id="exp-emp-desc" class="form-control" placeholder="تفاصيل المصروف"></div>
-        <button type="submit" class="btn btn-info">تسجيل المصروف</button>
+        <div class="form-group"><label>نوع المصروف</label><select id="exp-emp-type" class="form-control"><option value="أدوات عمل">أدوات عمل</option><option value="ملابس عمل">ملابس عمل</option><option value="مواصلات">مواصلات</option><option value="وجبات">وجبات</option><option value="مصروف شخصي">مصروف شخصي</option><option value="أخرى">أخرى</option></select></div>
+        <div class="form-group"><label>البيان</label><input type="text" id="exp-emp-desc" class="form-control"></div>
+        <button type="submit" class="btn btn-info">تسجيل</button>
         <button type="button" class="btn btn-secondary" onclick="closeModal('employee-expense-modal')">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- النوافذ الأخرى -->
   <div id="edit-sale-modal" class="modal">
     <div class="modal-content">
       <h3>تعديل فاتورة مبيعات</h3>
@@ -632,23 +761,13 @@
         <input type="hidden" id="edit-sale-id">
         <div class="form-group"><label>العميل</label><input type="text" id="edit-sale-customer" class="form-control" required></div>
         <div class="form-group"><label>رقم الهاتف</label><input type="text" id="edit-sale-phone" class="form-control"></div>
-        <div class="form-group">
-          <label>طريقة الدفع</label>
-          <select id="edit-sale-pay-type" class="form-control">
-            <option value="نقدي استلام الكاشير">مبيعات نقدية استلام الكاشير</option>
-            <option value="محفظة">مبيعات عن طريق المحفظة</option>
-            <option value="بنك انستا">مبيعات بنك حساب انستا</option>
-            <option value="تحويل بنكي آخر">مبيعات تحويل في حساب البنوك الأخرى</option>
-            <option value="آجل">مبيعات آجلة باسم العميل (كشف حساب)</option>
-            <option value="نقدي استلام المالك">مبيعات نقدية استلام المالك مباشرة</option>
-          </select>
-        </div>
+        <div class="form-group"><label>طريقة الدفع</label><select id="edit-sale-pay-type" class="form-control"><option value="نقدي استلام الكاشير">نقدي</option><option value="محفظة">محفظة</option><option value="بنك انستا">بنك انستا</option><option value="تحويل بنكي آخر">تحويل بنكي</option><option value="آجل">آجل</option><option value="نقدي استلام المالك">نقدي - المالك</option></select></div>
         <div class="form-group"><label>الخصم</label><input type="number" id="edit-sale-discount" class="form-control" value="0"></div>
         <div style="border:1px solid var(--border-color); border-radius:8px; padding:10px; margin-bottom:10px;">
           <label style="font-weight:600; color:var(--text-muted);">الأصناف:</label>
           <div id="edit-sale-items-container"></div>
         </div>
-        <button type="submit" class="btn btn-success">تحديث الفاتورة</button>
+        <button type="submit" class="btn btn-success">تحديث</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('edit-sale-modal')">إلغاء</button>
       </form>
     </div>
@@ -664,7 +783,7 @@
         <div class="form-group"><label>سعر الشراء</label><input type="number" id="edit-prod-buy" class="form-control" required></div>
         <div class="form-group"><label>سعر البيع</label><input type="number" id="edit-prod-sell" class="form-control" required></div>
         <div class="form-group"><label>الكمية</label><input type="number" id="edit-prod-qty" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">تحديث الصنف</button>
+        <button type="submit" class="btn btn-success">تحديث</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('edit-product-modal')">إلغاء</button>
       </form>
     </div>
@@ -679,16 +798,7 @@
         <div class="form-group"><label>البيان</label><input type="text" id="edit-pur-item" class="form-control" required></div>
         <div class="form-group"><label>الإجمالي</label><input type="number" id="edit-pur-total" class="form-control" required></div>
         <div class="form-group"><label>المدفوع</label><input type="number" id="edit-pur-paid" class="form-control" required></div>
-        <div class="form-group">
-          <label>طريقة الدفع</label>
-          <select id="edit-pur-pay-type" class="form-control">
-            <option value="نقدي من الصندوق">نقدي من الصندوق</option>
-            <option value="محفظة">محفظة</option>
-            <option value="انسته">أنستا باي</option>
-            <option value="بنك">بنك</option>
-            <option value="من المالك">من المالك</option>
-          </select>
-        </div>
+        <div class="form-group"><label>طريقة الدفع</label><select id="edit-pur-pay-type" class="form-control"><option value="نقدي من الصندوق">نقدي</option><option value="محفظة">محفظة</option><option value="انسته">أنستا</option><option value="بنك">بنك</option><option value="من المالك">من المالك</option></select></div>
         <button type="submit" class="btn btn-success">تحديث</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('edit-purchase-modal')">إلغاء</button>
       </form>
@@ -700,22 +810,7 @@
       <h3>تعديل مصروف</h3>
       <form id="edit-expense-form">
         <input type="hidden" id="edit-exp-id">
-        <div class="form-group">
-          <label>نوع المصروف</label>
-          <select id="edit-exp-cat" class="form-control">
-            <option value="مصروفات طعام">مصروفات طعام</option>
-            <option value="الرواتب">الرواتب</option>
-            <option value="مصروفات كهرباء">مصروفات كهرباء</option>
-            <option value="مصروفات إيجار">مصروفات إيجار</option>
-            <option value="مصروفات صيانة">مصروفات صيانة</option>
-            <option value="مصروفات ضيافة">مصروفات ضيافة</option>
-            <option value="مصروفات إكرامية">مصروفات إكرامية</option>
-            <option value="مصروفات نظافة">مصروفات نظافة</option>
-            <option value="أجور عمال">أجور عمال</option>
-            <option value="مصروفات متنوعة">مصروفات متنوعة</option>
-            <option value="مصروفات تشغيل">مصروفات تشغيل</option>
-          </select>
-        </div>
+        <div class="form-group"><label>نوع المصروف</label><select id="edit-exp-cat" class="form-control"><option value="مصروفات طعام">طعام</option><option value="الرواتب">رواتب</option><option value="مصروفات كهرباء">كهرباء</option><option value="مصروفات إيجار">إيجار</option><option value="مصروفات صيانة">صيانة</option><option value="مصروفات ضيافة">ضيافة</option><option value="مصروفات إكرامية">إكرامية</option><option value="مصروفات نظافة">نظافة</option><option value="أجور عمال">أجور عمال</option><option value="مصروفات متنوعة">متنوعة</option><option value="مصروفات تشغيل">تشغيل</option></select></div>
         <div class="form-group"><label>المبلغ</label><input type="number" id="edit-exp-amount" class="form-control" required></div>
         <div class="form-group"><label>البيان</label><input type="text" id="edit-exp-desc" class="form-control" required></div>
         <button type="submit" class="btn btn-success">تحديث</button>
@@ -729,18 +824,7 @@
       <h3>تعديل أصل / حساب</h3>
       <form id="edit-asset-form">
         <input type="hidden" id="edit-asset-id">
-        <div class="form-group">
-          <label>النوع</label>
-          <select id="edit-asset-type" class="form-control">
-            <option value="السيارات">السيارات</option>
-            <option value="الأثاث">الأثاث</option>
-            <option value="الأصول">الأصول</option>
-            <option value="الالتزامات">الالتزامات</option>
-            <option value="رأس المال">رأس المال</option>
-            <option value="مصاريف التأسيس">مصاريف التأسيس</option>
-            <option value="حقوق الملكية">حقوق الملكية</option>
-          </select>
-        </div>
+        <div class="form-group"><label>النوع</label><select id="edit-asset-type" class="form-control"><option value="السيارات">سيارات</option><option value="الأثاث">أثاث</option><option value="الأصول">أصول</option><option value="الالتزامات">التزامات</option><option value="رأس المال">رأس المال</option><option value="مصاريف التأسيس">مصاريف التأسيس</option><option value="حقوق الملكية">حقوق الملكية</option></select></div>
         <div class="form-group"><label>البيان</label><input type="text" id="edit-asset-desc" class="form-control" required></div>
         <div class="form-group"><label>القيمة</label><input type="number" id="edit-asset-value" class="form-control" required></div>
         <button type="submit" class="btn btn-success">تحديث</button>
@@ -753,12 +837,12 @@
     <div class="modal-content">
       <h3>تسجيل صنف جديد</h3>
       <form id="product-form">
-        <div class="form-group"><label>كود الصنف (تلقائي)</label><input type="text" id="prod-code" class="form-control" readonly></div>
+        <div class="form-group"><label>كود الصنف</label><input type="text" id="prod-code" class="form-control" readonly></div>
         <div class="form-group"><label>اسم الصنف</label><input type="text" id="prod-name" class="form-control" required></div>
         <div class="form-group"><label>سعر الشراء</label><input type="number" id="prod-buy" class="form-control" required></div>
         <div class="form-group"><label>سعر البيع</label><input type="number" id="prod-sell" class="form-control" required></div>
         <div class="form-group"><label>الكمية</label><input type="number" id="prod-qty" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">حفظ الصنف</button>
+        <button type="submit" class="btn btn-success">حفظ</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('product-modal')">إلغاء</button>
       </form>
     </div>
@@ -772,16 +856,7 @@
         <div class="form-group"><label>البيان</label><input type="text" id="pur-item" class="form-control" required></div>
         <div class="form-group"><label>الإجمالي</label><input type="number" id="pur-total" class="form-control" required></div>
         <div class="form-group"><label>المدفوع</label><input type="number" id="pur-paid" class="form-control" required></div>
-        <div class="form-group">
-          <label>طريقة الدفع</label>
-          <select id="pur-pay-type" class="form-control">
-            <option value="نقدي من الصندوق">نقدي من الصندوق</option>
-            <option value="محفظة">محفظة</option>
-            <option value="انسته">أنستا باي</option>
-            <option value="بنك">بنك</option>
-            <option value="من المالك">من المالك</option>
-          </select>
-        </div>
+        <div class="form-group"><label>طريقة الدفع</label><select id="pur-pay-type" class="form-control"><option value="نقدي من الصندوق">نقدي</option><option value="محفظة">محفظة</option><option value="انسته">أنستا</option><option value="بنك">بنك</option><option value="من المالك">من المالك</option></select></div>
         <button type="submit" class="btn btn-success">حفظ</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('purchase-modal')">إلغاء</button>
       </form>
@@ -792,13 +867,7 @@
     <div class="modal-content">
       <h3>تحويل بضائع - فرع اهالينا</h3>
       <form id="transfer-form">
-        <div class="form-group">
-          <label>نوع الحركة</label>
-          <select id="trans-type" class="form-control">
-            <option value="إخراج إلى فرع اهالينا">إخراج بضاعة إلى فرع اهالينا</option>
-            <option value="إدخال من فرع اهالينا">إدخال بضاعة من فرع اهالينا</option>
-          </select>
-        </div>
+        <div class="form-group"><label>نوع الحركة</label><select id="trans-type" class="form-control"><option value="إخراج إلى فرع اهالينا">إخراج إلى فرع اهالينا</option><option value="إدخال من فرع اهالينا">إدخال من فرع اهالينا</option></select></div>
         <div class="form-group"><label>اسم الصنف</label><input type="text" id="trans-item" class="form-control" required></div>
         <div class="form-group"><label>الكمية</label><input type="number" id="trans-qty" class="form-control" required></div>
         <button type="submit" class="btn btn-success">تنفيذ</button>
@@ -811,22 +880,7 @@
     <div class="modal-content">
       <h3>تسجيل مصروف</h3>
       <form id="expense-form">
-        <div class="form-group">
-          <label>نوع المصروف</label>
-          <select id="exp-cat" class="form-control">
-            <option value="مصروفات طعام">مصروفات طعام</option>
-            <option value="الرواتب">الرواتب</option>
-            <option value="مصروفات كهرباء">مصروفات كهرباء</option>
-            <option value="مصروفات إيجار">مصروفات إيجار</option>
-            <option value="مصروفات صيانة">مصروفات صيانة</option>
-            <option value="مصروفات ضيافة">مصروفات ضيافة</option>
-            <option value="مصروفات إكرامية">مصروفات إكرامية</option>
-            <option value="مصروفات نظافة">مصروفات نظافة</option>
-            <option value="أجور عمال">أجور عمال</option>
-            <option value="مصروفات متنوعة">مصروفات متنوعة</option>
-            <option value="مصروفات تشغيل">مصروفات تشغيل</option>
-          </select>
-        </div>
+        <div class="form-group"><label>نوع المصروف</label><select id="exp-cat" class="form-control"><option value="مصروفات طعام">طعام</option><option value="الرواتب">رواتب</option><option value="مصروفات كهرباء">كهرباء</option><option value="مصروفات إيجار">إيجار</option><option value="مصروفات صيانة">صيانة</option><option value="مصروفات ضيافة">ضيافة</option><option value="مصروفات إكرامية">إكرامية</option><option value="مصروفات نظافة">نظافة</option><option value="أجور عمال">أجور عمال</option><option value="مصروفات متنوعة">متنوعة</option><option value="مصروفات تشغيل">تشغيل</option></select></div>
         <div class="form-group"><label>المبلغ</label><input type="number" id="exp-amount" class="form-control" required></div>
         <div class="form-group"><label>البيان</label><input type="text" id="exp-desc" class="form-control" required></div>
         <button type="submit" class="btn btn-success">تسجيل</button>
@@ -839,18 +893,7 @@
     <div class="modal-content">
       <h3>تسجيل أصل أو حساب</h3>
       <form id="asset-form">
-        <div class="form-group">
-          <label>النوع</label>
-          <select id="asset-type" class="form-control">
-            <option value="السيارات">السيارات</option>
-            <option value="الأثاث">الأثاث</option>
-            <option value="الأصول">الأصول</option>
-            <option value="الالتزامات">الالتزامات</option>
-            <option value="رأس المال">رأس المال</option>
-            <option value="مصاريف التأسيس">مصاريف التأسيس</option>
-            <option value="حقوق الملكية">حقوق الملكية</option>
-          </select>
-        </div>
+        <div class="form-group"><label>النوع</label><select id="asset-type" class="form-control"><option value="السيارات">سيارات</option><option value="الأثاث">أثاث</option><option value="الأصول">أصول</option><option value="الالتزامات">التزامات</option><option value="رأس المال">رأس المال</option><option value="مصاريف التأسيس">مصاريف التأسيس</option><option value="حقوق الملكية">حقوق الملكية</option></select></div>
         <div class="form-group"><label>البيان</label><input type="text" id="asset-desc" class="form-control" required></div>
         <div class="form-group"><label>القيمة</label><input type="number" id="asset-value" class="form-control" required></div>
         <button type="submit" class="btn btn-success">حفظ</button>
@@ -866,7 +909,7 @@
         <div class="form-group"><label>اسم الصنف</label><input type="text" id="temp-name" class="form-control" required></div>
         <div class="form-group"><label>السعر</label><input type="number" id="temp-price" class="form-control" required></div>
         <div class="form-group"><label>الكمية</label><input type="number" id="temp-qty" class="form-control" value="1" required></div>
-        <button type="submit" class="btn btn-success">إضافة للفاتورة</button>
+        <button type="submit" class="btn btn-success">إضافة</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('temp-item-modal')">إلغاء</button>
       </form>
     </div>
@@ -878,14 +921,7 @@
       <form id="user-form">
         <div class="form-group"><label>اسم المستخدم</label><input type="text" id="usr-name" class="form-control" required></div>
         <div class="form-group"><label>كلمة المرور</label><input type="password" id="usr-pass" class="form-control" required></div>
-        <div class="form-group">
-          <label>الدور</label>
-          <select id="usr-role" class="form-control">
-            <option value="المدير المالي (الكنترول)">المدير المالي (الكنترول)</option>
-            <option value="الكاشير">الكاشير</option>
-            <option value="مسؤول المخزن">مسؤول المخزن</option>
-          </select>
-        </div>
+        <div class="form-group"><label>الدور</label><select id="usr-role" class="form-control"><option value="المدير المالي (الكنترول)">المدير المالي</option><option value="الكاشير">الكاشير</option><option value="مسؤول المخزن">مسؤول المخزن</option></select></div>
         <button type="submit" class="btn btn-success">حفظ</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('user-modal')">إلغاء</button>
       </form>
@@ -897,7 +933,7 @@
     // محرك البيانات
     // ==========================================================================
     const DB_NAME = 'AbuSaud_ERP_DB';
-    const DB_VERSION = 7;
+    const DB_VERSION = 9;
     let dbInstance = null;
     let currentUser = null;
     let cart = [];
@@ -915,7 +951,7 @@
         req.onsuccess = (e) => { dbInstance = e.target.result; resolve(dbInstance); };
         req.onupgradeneeded = (e) => {
           const db = e.target.result;
-          const stores = ['Users', 'Products', 'Sales', 'Purchases', 'Employees', 'Advances', 'Expenses', 'Assets', 'Transfers', 'AuditLogs', 'EmployeeTransactions'];
+          const stores = ['Users', 'Products', 'Sales', 'Purchases', 'Employees', 'Advances', 'Expenses', 'Assets', 'Transfers', 'AuditLogs', 'EmployeeTransactions', 'CustomerPayments'];
           stores.forEach(s => { 
             if (!db.objectStoreNames.contains(s)) {
               db.createObjectStore(s, { keyPath: 'id', autoIncrement: true });
@@ -983,7 +1019,7 @@
     };
 
     const PERMISSIONS = {
-      'المدير المالي (الكنترول)': ['dashboard', 'sales', 'purchases', 'inventory', 'employees', 'expenses', 'assets', 'reports', 'users', 'settings'],
+      'المدير المالي (الكنترول)': ['dashboard', 'sales', 'customers', 'purchases', 'inventory', 'employees', 'expenses', 'assets', 'reports', 'users', 'settings'],
       'الكاشير': ['sales'],
       'مسؤول المخزن': ['inventory']
     };
@@ -1028,7 +1064,6 @@
         other: emp.otherAllowance || 0
       };
       
-      // الخصومات الأساسية (الثابتة في الموظف)
       const baseDeductions = {
         insurance: emp.insurance || 0,
         fixed: emp.fixedDeduction || 0
@@ -1036,8 +1071,6 @@
       
       const totalAllowances = Object.values(allowances).reduce((a, b) => a + b, 0);
       const totalBaseDeductions = Object.values(baseDeductions).reduce((a, b) => a + b, 0);
-      
-      // الخصومات الإضافية من المعاملات (خصومات، غياب، مصروفات)
       const extraDeductions = emp.totalExtraDeductions || 0;
       
       const netSalary = base + totalAllowances - totalBaseDeductions - extraDeductions;
@@ -1055,7 +1088,7 @@
     }
 
     // ==========================================================================
-    // المبيعات (مختصر)
+    // المبيعات
     // ==========================================================================
     let isNewSaleMode = false;
 
@@ -1064,6 +1097,7 @@
       document.getElementById('sales-list-container').style.display = 'none';
       document.getElementById('new-sale-container').style.display = 'block';
       cart = [];
+      document.getElementById('pos-paid').value = '0';
       updateCartUI();
       renderPOS();
     }
@@ -1126,13 +1160,21 @@
         </tr>`;
       });
       const disc = parseFloat(document.getElementById('pos-discount').value) || 0;
-      document.getElementById('pos-total').innerText = Math.max(0, tot - disc);
+      const total = Math.max(0, tot - disc);
+      document.getElementById('pos-total').innerText = total;
+      
+      const paid = parseFloat(document.getElementById('pos-paid').value) || 0;
+      const remaining = Math.max(0, total - paid);
+      document.getElementById('pos-paid-display').innerText = paid;
+      document.getElementById('pos-remaining-display').innerText = remaining;
     }
 
     function removeFromCart(index) {
       cart.splice(index, 1);
       updateCartUI();
     }
+
+    document.getElementById('pos-paid').addEventListener('input', updateCartUI);
 
     function openTempItemModal() { 
       document.getElementById('temp-item-modal').classList.add('active'); 
@@ -1157,6 +1199,8 @@
       const customer = document.getElementById('pos-customer').value.trim() || 'عميل نقدي';
       const phone = document.getElementById('pos-phone').value.trim() || '-';
       const discount = parseFloat(document.getElementById('pos-discount').value) || 0;
+      const paid = parseFloat(document.getElementById('pos-paid').value) || 0;
+      const remaining = Math.max(0, total - paid);
       
       const saleData = {
         date: new Date().toLocaleString('ar-EG'),
@@ -1165,13 +1209,16 @@
         items: JSON.parse(JSON.stringify(cart)),
         total: total,
         discount: discount,
+        paid: paid,
+        remaining: remaining,
         payType: payType,
         cashier: currentUser.username
       };
 
       await DataService.add('Sales', saleData);
-      await logAudit('إصدار فاتورة مبيعات', `فاتورة بمبلغ ${total} - العميل: ${customer}`);
+      await logAudit('إصدار فاتورة مبيعات', `فاتورة بمبلغ ${total} - العميل: ${customer} - المدفوع: ${paid} - المتبقي: ${remaining}`);
 
+      // تحديث المخزون
       for (let item of cart) {
         if (typeof item.id === 'number') {
           const prod = await DataService.getById('Products', item.id);
@@ -1182,24 +1229,93 @@
         }
       }
 
+      // تسجيل دفعة العميل إذا كان آجل وتم دفع مبلغ
+      if (payType === 'آجل' && paid > 0) {
+        await DataService.add('CustomerPayments', {
+          customer: customer,
+          phone: phone,
+          amount: paid,
+          method: 'نقدي',
+          desc: `دفعة على فاتورة #${Date.now()}`,
+          date: new Date().toLocaleString('ar-EG'),
+          saleId: saleData.id
+        });
+      }
+
+      // طباعة الفاتورة
       const printArea = document.getElementById('print-area');
       printArea.innerHTML = `
-        <div class="thermal-80mm">
-          <h3 style="text-align:center">أبو السعود علام</h3>
-          <p style="text-align:center; font-size:12px;">فاتورة مبيعات</p>
-          <hr>
-          <p>التاريخ: ${saleData.date}</p>
-          <p>العميل: ${customer}</p>
-          <p>الهاتف: ${phone}</p>
-          <p>طريقة الدفع: ${payType}</p>
-          <hr>
+        <div class="print-invoice">
+          <div class="header">
+            <h1>أبو السعود علام</h1>
+            <p>فاتورة مبيعات</p>
+            <p style="font-size:11px; color:#666;">رقم الفاتورة: #${Date.now().toString().slice(-6)}</p>
+          </div>
+          
+          <div class="info">
+            <div><strong>التاريخ:</strong> ${saleData.date}</div>
+            <div><strong>الكاشير:</strong> ${currentUser.username}</div>
+          </div>
+          <div class="info">
+            <div><strong>العميل:</strong> ${customer}</div>
+            <div><strong>الهاتف:</strong> ${phone}</div>
+          </div>
+          <div class="info">
+            <div><strong>طريقة الدفع:</strong> ${payType}</div>
+            <div><span class="badge-print">${payType === 'آجل' ? 'آجل' : 'نقدي'}</span></div>
+          </div>
+          
           <table>
-            <thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th></tr></thead>
-            <tbody>${cart.map(c => `<tr><td>${c.name}</td><td>${c.qty}</td><td>${c.price * c.qty}</td></tr>`).join('')}</tbody>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>الصنف</th>
+                <th>الكمية</th>
+                <th>السعر</th>
+                <th>الإجمالي</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${cart.map((c, i) => `<tr>
+                <td>${i + 1}</td>
+                <td>${c.name}</td>
+                <td>${c.qty}</td>
+                <td>${c.price}</td>
+                <td>${c.price * c.qty}</td>
+              </tr>`).join('')}
+            </tbody>
           </table>
-          <hr>
-          <h4>الإجمالي: ${total} ج.م</h4>
-          <p style="text-align:center; font-size:10px; color:#666;">شكراً لكم - أبو السعود علام</p>
+          
+          <div class="total-section">
+            <div class="total-line">
+              <span>الإجمالي</span>
+              <strong>${total} ج.م</strong>
+            </div>
+            ${payType === 'آجل' ? `
+              <div class="total-line paid">
+                <span>المدفوع</span>
+                <strong>${paid} ج.م</strong>
+              </div>
+              <div class="total-line remaining">
+                <span>المتبقي</span>
+                <strong>${remaining} ج.م</strong>
+              </div>
+              <div class="total-line total">
+                <span>المطلوب</span>
+                <strong>${total} ج.م</strong>
+              </div>
+            ` : `
+              <div class="total-line total">
+                <span>المطلوب</span>
+                <strong>${total} ج.م</strong>
+              </div>
+            `}
+          </div>
+          
+          <div class="footer">
+            <p>شكراً لكم على ثقتكم</p>
+            <p style="font-size:9px; color:#999;">أبو السعود علام - إدارة المؤسسة والزيوت</p>
+          </div>
         </div>
       `;
       window.print();
@@ -1208,6 +1324,7 @@
       document.getElementById('pos-customer').value = '';
       document.getElementById('pos-phone').value = '';
       document.getElementById('pos-discount').value = '0';
+      document.getElementById('pos-paid').value = '0';
       renderInventory();
       cancelNewSale();
     }
@@ -1224,6 +1341,8 @@
           <td>${s.customer || 'عميل نقدي'}</td>
           <td>${s.phone || '-'}</td>
           <td>${s.total} ج.م</td>
+          <td>${s.paid || 0} ج.م</td>
+          <td style="color:${(s.remaining || 0) > 0 ? 'var(--danger-color)' : 'var(--success-color)'};">${s.remaining || 0} ج.م</td>
           <td>${s.payType}</td>
           <td>${s.cashier || '-'}</td>
           <td>
@@ -1351,6 +1470,10 @@
         }
       }
       
+      // الاحتفاظ بقيم المدفوع والمتبقي من الفاتورة القديمة
+      const paid = oldSale ? oldSale.paid || 0 : 0;
+      const remaining = Math.max(0, finalTotal - paid);
+      
       await DataService.update('Sales', {
         id: id,
         date: oldSale ? oldSale.date : new Date().toLocaleString('ar-EG'),
@@ -1359,6 +1482,8 @@
         items: editCartItems,
         total: finalTotal,
         discount: discount,
+        paid: paid,
+        remaining: remaining,
         payType: payType,
         cashier: currentUser.username,
         edited: true,
@@ -1399,11 +1524,325 @@
     }
 
     // ==========================================================================
-    // وظائف الموظفين
+    // العملاء - كشوف الآجل
     // ==========================================================================
-    function openEmployeeModal() { 
-      document.getElementById('employee-modal').classList.add('active'); 
+    async function renderCustomers() {
+      const sales = await DataService.getAll('Sales');
+      const payments = await DataService.getAll('CustomerPayments');
+      
+      const customersMap = {};
+      sales.forEach(s => {
+        if (s.payType === 'آجل' || (s.remaining && s.remaining > 0)) {
+          const key = s.customer + '|' + s.phone;
+          if (!customersMap[key]) {
+            customersMap[key] = {
+              name: s.customer,
+              phone: s.phone || '-',
+              totalSales: 0,
+              totalPaid: 0,
+              count: 0
+            };
+          }
+          customersMap[key].totalSales += s.total || 0;
+          customersMap[key].totalPaid += s.paid || 0;
+          customersMap[key].count++;
+        }
+      });
+      
+      payments.forEach(p => {
+        const key = p.customer + '|' + p.phone;
+        if (customersMap[key]) {
+          customersMap[key].totalPaid += p.amount || 0;
+        } else {
+          if (!customersMap[key]) {
+            customersMap[key] = {
+              name: p.customer,
+              phone: p.phone || '-',
+              totalSales: 0,
+              totalPaid: 0,
+              count: 0
+            };
+          }
+          customersMap[key].totalPaid += p.amount || 0;
+        }
+      });
+      
+      const customers = Object.values(customersMap);
+      
+      document.getElementById('customers-table-body').innerHTML = customers.map((c, index) => {
+        const remaining = c.totalSales - c.totalPaid;
+        return `<tr>
+          <td>${index + 1}</td>
+          <td><span class="customer-badge">${c.name}</span></td>
+          <td>${c.phone}</td>
+          <td>${c.totalSales} ج.م</td>
+          <td>${c.totalPaid} ج.م</td>
+          <td style="color:${remaining > 0 ? 'var(--danger-color)' : 'var(--success-color)'}; font-weight:bold;">${remaining} ج.م</td>
+          <td>${c.count}</td>
+          <td>
+            <button class="btn btn-info" onclick="showCustomerStatement('${c.name}', '${c.phone}')">كشف حساب</button>
+          </td>
+        </tr>`;
+      }).join('');
     }
+
+    // ==========================================================================
+    // عرض كشف حساب العميل
+    // ==========================================================================
+    async function showCustomerStatement(name, phone) {
+      const sales = await DataService.getAll('Sales');
+      const payments = await DataService.getAll('CustomerPayments');
+      
+      const customerSales = sales.filter(s => s.customer === name && s.phone === phone);
+      const customerPayments = payments.filter(p => p.customer === name && p.phone === phone);
+      
+      let html = `
+        <div style="margin-bottom:15px;">
+          <h4 style="color:var(--accent-color);">${name}</h4>
+          <p>الهاتف: ${phone}</p>
+          <hr>
+        </div>
+        <table>
+          <thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>البيان</th></tr></thead>
+          <tbody>
+      `;
+      
+      let totalPaid = 0;
+      let totalSales = 0;
+      
+      customerSales.forEach(s => {
+        totalSales += s.total || 0;
+        html += `<tr>
+          <td>${s.date}</td>
+          <td><span class="badge badge-warning">فاتورة</span></td>
+          <td>${s.total} ج.م</td>
+          <td>فاتورة #${s.id}</td>
+        </tr>`;
+      });
+      
+      customerPayments.forEach(p => {
+        totalPaid += p.amount || 0;
+        html += `<tr>
+          <td>${p.date}</td>
+          <td><span class="badge badge-success">دفعة</span></td>
+          <td style="color:var(--success-color);">${p.amount} ج.م</td>
+          <td>${p.desc || ''}</td>
+        </tr>`;
+      });
+      
+      const remaining = totalSales - totalPaid;
+      
+      html += `
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="2" style="text-align:left;">إجمالي المشتريات</td>
+              <td>${totalSales} ج.م</td>
+              <td></td>
+            </tr>
+            <tr class="total-row">
+              <td colspan="2" style="text-align:left;">إجمالي المدفوع</td>
+              <td style="color:var(--success-color);">${totalPaid} ج.م</td>
+              <td></td>
+            </tr>
+            <tr class="total-row">
+              <td colspan="2" style="text-align:left; font-size:1.1rem;">المتبقي</td>
+              <td style="color:${remaining > 0 ? 'var(--danger-color)' : 'var(--success-color)'}; font-size:1.2rem; font-weight:bold;">${remaining} ج.م</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+      
+      document.getElementById('customer-statement-content').innerHTML = html;
+      document.getElementById('customer-statement-modal').classList.add('active');
+      
+      window._statementData = { name, phone, customerSales, customerPayments, totalSales, totalPaid, remaining };
+    }
+
+    function printCustomerStatement() {
+      const data = window._statementData;
+      if (!data) return;
+      
+      const printArea = document.getElementById('print-area');
+      let tableRows = '';
+      data.customerSales.forEach(s => {
+        tableRows += `<tr><td>${s.date}</td><td>فاتورة</td><td>${s.total} ج.م</td><td>فاتورة #${s.id}</td></tr>`;
+      });
+      data.customerPayments.forEach(p => {
+        tableRows += `<tr><td>${p.date}</td><td>دفعة</td><td style="color:green;">${p.amount} ج.م</td><td>${p.desc || ''}</td></tr>`;
+      });
+      
+      printArea.innerHTML = `
+        <div class="print-report">
+          <div class="header">
+            <h1>أبو السعود علام</h1>
+            <h2>كشف حساب العميل</h2>
+            <p>التاريخ: ${new Date().toLocaleString('ar-EG')}</p>
+          </div>
+          <div style="margin-bottom:15px;">
+            <h4>${data.name}</h4>
+            <p>الهاتف: ${data.phone}</p>
+          </div>
+          <table>
+            <thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>البيان</th></tr></thead>
+            <tbody>${tableRows}</tbody>
+            <tfoot>
+              <tr class="total-row"><td colspan="2">إجمالي المشتريات</td><td>${data.totalSales} ج.م</td><td></td></tr>
+              <tr class="total-row"><td colspan="2">إجمالي المدفوع</td><td style="color:green;">${data.totalPaid} ج.م</td><td></td></tr>
+              <tr class="total-row" style="font-size:1.2rem;"><td colspan="2">المتبقي</td><td style="color:${data.remaining > 0 ? '#dc3545' : '#28a745'}; font-weight:bold;">${data.remaining} ج.م</td><td></td></tr>
+            </tfoot>
+          </table>
+          <div style="margin-top:20px; text-align:center; font-size:12px; color:#666;">
+            تم إنشاء هذا التقرير بواسطة: ${currentUser.username}
+          </div>
+        </div>
+      `;
+      window.print();
+    }
+
+    // ==========================================================================
+    // تسجيل دفعة من عميل
+    // ==========================================================================
+    async function openCustomerPaymentModal() {
+      const sales = await DataService.getAll('Sales');
+      const customers = {};
+      sales.forEach(s => {
+        if (s.customer && s.customer !== 'عميل نقدي') {
+          const key = s.customer + '|' + (s.phone || '-');
+          customers[key] = { name: s.customer, phone: s.phone || '-' };
+        }
+      });
+      
+      const sel = document.getElementById('cust-pay-customer');
+      sel.innerHTML = '<option value="">-- اختر عميل --</option>';
+      Object.values(customers).forEach(c => {
+        sel.innerHTML += `<option value="${c.name}|${c.phone}">${c.name} (${c.phone})</option>`;
+      });
+      
+      document.getElementById('customer-payment-modal').classList.add('active');
+    }
+
+    document.getElementById('customer-payment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const value = document.getElementById('cust-pay-customer').value;
+      if (!value) return alert('يرجى اختيار عميل!');
+      const [name, phone] = value.split('|');
+      const amount = parseFloat(document.getElementById('cust-pay-amount').value);
+      const method = document.getElementById('cust-pay-method').value;
+      const desc = document.getElementById('cust-pay-desc').value || 'دفعة';
+      
+      if (!amount || amount <= 0) return alert('يرجى إدخال مبلغ صحيح!');
+      
+      await DataService.add('CustomerPayments', {
+        customer: name,
+        phone: phone,
+        amount: amount,
+        method: method,
+        desc: desc,
+        date: new Date().toLocaleString('ar-EG')
+      });
+      
+      // تحديث المدفوعات في الفواتير المفتوحة (أولاً بأول)
+      const sales = await DataService.getAll('Sales');
+      let remainingAmount = amount;
+      const customerSales = sales
+        .filter(s => s.customer === name && s.phone === phone && (s.remaining || 0) > 0)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      for (let sale of customerSales) {
+        if (remainingAmount <= 0) break;
+        const saleRemaining = sale.remaining || 0;
+        const payNow = Math.min(remainingAmount, saleRemaining);
+        sale.paid = (sale.paid || 0) + payNow;
+        sale.remaining = Math.max(0, saleRemaining - payNow);
+        await DataService.update('Sales', sale);
+        remainingAmount -= payNow;
+      }
+      
+      closeModal('customer-payment-modal');
+      document.getElementById('customer-payment-form').reset();
+      renderCustomers();
+      renderSales();
+      await logAudit('تسجيل دفعة عميل', `دفعة بمبلغ ${amount} من العميل: ${name}`);
+      alert('تم تسجيل الدفعة بنجاح!');
+    });
+
+    // ==========================================================================
+    // طباعة تقرير العملاء
+    // ==========================================================================
+    async function printCustomersReport() {
+      const sales = await DataService.getAll('Sales');
+      const payments = await DataService.getAll('CustomerPayments');
+      
+      const customersMap = {};
+      sales.forEach(s => {
+        if (s.payType === 'آجل' || (s.remaining && s.remaining > 0)) {
+          const key = s.customer + '|' + s.phone;
+          if (!customersMap[key]) {
+            customersMap[key] = { name: s.customer, phone: s.phone || '-', totalSales: 0, totalPaid: 0 };
+          }
+          customersMap[key].totalSales += s.total || 0;
+          customersMap[key].totalPaid += s.paid || 0;
+        }
+      });
+      
+      payments.forEach(p => {
+        const key = p.customer + '|' + p.phone;
+        if (customersMap[key]) {
+          customersMap[key].totalPaid += p.amount || 0;
+        }
+      });
+      
+      const customers = Object.values(customersMap);
+      if (customers.length === 0) {
+        return alert('لا يوجد عملاء آجل!');
+      }
+      
+      let tableRows = customers.map((c, i) => {
+        const remaining = c.totalSales - c.totalPaid;
+        return `<tr>
+          <td>${i+1}</td>
+          <td>${c.name}</td>
+          <td>${c.phone}</td>
+          <td>${c.totalSales} ج.م</td>
+          <td>${c.totalPaid} ج.م</td>
+          <td style="color:${remaining > 0 ? '#dc3545' : '#28a745'}; font-weight:bold;">${remaining} ج.م</td>
+        </tr>`;
+      }).join('');
+      
+      const totalRemaining = customers.reduce((sum, c) => sum + (c.totalSales - c.totalPaid), 0);
+      
+      const printArea = document.getElementById('print-area');
+      printArea.innerHTML = `
+        <div class="print-report">
+          <div class="header">
+            <h1>أبو السعود علام</h1>
+            <h2>تقرير عملاء الآجل</h2>
+            <p>التاريخ: ${new Date().toLocaleString('ar-EG')}</p>
+          </div>
+          <table>
+            <thead><tr><th>#</th><th>اسم العميل</th><th>الهاتف</th><th>إجمالي المشتريات</th><th>إجمالي المدفوع</th><th>المتبقي</th></tr></thead>
+            <tbody>${tableRows}</tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="5" style="text-align:left;">إجمالي المستحق على العملاء</td>
+                <td style="font-size:1.2rem;">${totalRemaining} ج.م</td>
+              </tr>
+            </tfoot>
+          </table>
+          <div style="margin-top:20px; text-align:center; font-size:12px; color:#666;">
+            تم إنشاء هذا التقرير بواسطة: ${currentUser.username}
+          </div>
+        </div>
+      `;
+      window.print();
+    }
+
+    // ==========================================================================
+    // وظائف الموظفين (مختصرة)
+    // ==========================================================================
+    function openEmployeeModal() { document.getElementById('employee-modal').classList.add('active'); }
 
     document.getElementById('employee-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1411,14 +1850,8 @@
         name: document.getElementById('emp-name').value,
         date: document.getElementById('emp-date').value,
         salary: parseFloat(document.getElementById('emp-salary').value) || 0,
-        transportAllowance: 0,
-        housingAllowance: 0,
-        bonus: 0,
-        commission: 0,
-        otherAllowance: 0,
-        insurance: 0,
-        fixedDeduction: 0,
-        totalExtraDeductions: 0
+        transportAllowance: 0, housingAllowance: 0, bonus: 0, commission: 0, otherAllowance: 0,
+        insurance: 0, fixedDeduction: 0, totalExtraDeductions: 0
       });
       closeModal('employee-modal');
       document.getElementById('employee-form').reset();
@@ -1426,36 +1859,25 @@
       renderEmployeeTransactions();
     });
 
-    // ==========================================================================
-    // تعديل الموظف
-    // ==========================================================================
     async function editEmployee(id) {
-      if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('التعديل متاح فقط للكنترول!');
-      }
+      if (currentUser.role !== 'المدير المالي (الكنترول)') return alert('التعديل متاح فقط للكنترول!');
       const item = await DataService.getById('Employees', id);
       if (!item) return alert('البيانات غير موجودة!');
-      
       document.getElementById('edit-emp-id').value = item.id;
       document.getElementById('edit-emp-name').value = item.name;
       document.getElementById('edit-emp-date').value = item.date;
       document.getElementById('edit-emp-salary').value = item.salary;
-      
       document.getElementById('edit-emp-transport').value = item.transportAllowance || 0;
       document.getElementById('edit-emp-housing').value = item.housingAllowance || 0;
       document.getElementById('edit-emp-bonus').value = item.bonus || 0;
       document.getElementById('edit-emp-commission').value = item.commission || 0;
       document.getElementById('edit-emp-other-allowance').value = item.otherAllowance || 0;
-      
       document.getElementById('edit-emp-insurance').value = item.insurance || 0;
       document.getElementById('edit-emp-fixed-deduction').value = item.fixedDeduction || 0;
-      
       updateEditSalarySummary();
-      
       document.querySelectorAll('#edit-employee-form input[type="number"]').forEach(input => {
         input.addEventListener('input', updateEditSalarySummary);
       });
-      
       document.getElementById('edit-employee-modal').classList.add('active');
     }
 
@@ -1466,28 +1888,21 @@
       const bonus = parseFloat(document.getElementById('edit-emp-bonus').value) || 0;
       const commission = parseFloat(document.getElementById('edit-emp-commission').value) || 0;
       const otherAllowance = parseFloat(document.getElementById('edit-emp-other-allowance').value) || 0;
-      
       const insurance = parseFloat(document.getElementById('edit-emp-insurance').value) || 0;
       const fixedDeduction = parseFloat(document.getElementById('edit-emp-fixed-deduction').value) || 0;
-      
       const totalAllowances = transport + housing + bonus + commission + otherAllowance;
       const totalDeductions = insurance + fixedDeduction;
-      const netSalary = base + totalAllowances - totalDeductions;
-      
       document.getElementById('edit-total-allowances').innerText = totalAllowances;
       document.getElementById('edit-total-deductions').innerText = totalDeductions;
-      document.getElementById('edit-net-salary').innerText = netSalary;
+      document.getElementById('edit-net-salary').innerText = base + totalAllowances - totalDeductions;
     }
 
     document.getElementById('edit-employee-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = parseInt(document.getElementById('edit-emp-id').value);
-      
-      // حساب الخصومات الإضافية من المعاملات
       const transactions = await DataService.getAll('EmployeeTransactions');
       const empTransactions = transactions.filter(t => t.empId === id);
       const totalExtraDeductions = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
-      
       await DataService.update('Employees', {
         id: id,
         name: document.getElementById('edit-emp-name').value,
@@ -1502,15 +1917,11 @@
         fixedDeduction: parseFloat(document.getElementById('edit-emp-fixed-deduction').value) || 0,
         totalExtraDeductions: totalExtraDeductions
       });
-      
       closeModal('edit-employee-modal');
       renderEmployees();
       await logAudit('تعديل موظف', `تعديل بيانات الموظف: ${document.getElementById('edit-emp-name').value}`);
     });
 
-    // ==========================================================================
-    // تسجيل سلفة
-    // ==========================================================================
     async function openAdvanceModal() {
       const emps = await DataService.getAll('Employees');
       const sel = document.getElementById('adv-emp-id');
@@ -1523,28 +1934,16 @@
       const empId = parseInt(document.getElementById('adv-emp-id').value);
       const amount = parseFloat(document.getElementById('adv-amount').value);
       const desc = document.getElementById('adv-desc').value || 'سلفة';
-      
       const emp = await DataService.getById('Employees', empId);
-      
       await DataService.add('EmployeeTransactions', {
-        empId: empId,
-        empName: emp ? emp.name : '',
-        type: 'سلفة',
-        amount: amount,
-        desc: desc,
-        date: new Date().toLocaleString('ar-EG')
+        empId, empName: emp ? emp.name : '', type: 'سلفة', amount, desc, date: new Date().toLocaleString('ar-EG')
       });
-      
-      // تحديث الخصومات الإضافية
       const transactions = await DataService.getAll('EmployeeTransactions');
       const empTransactions = transactions.filter(t => t.empId === empId);
-      const totalExtra = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
-      
       if (emp) {
-        emp.totalExtraDeductions = totalExtra;
+        emp.totalExtraDeductions = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
         await DataService.update('Employees', emp);
       }
-      
       closeModal('advance-modal');
       document.getElementById('advance-form').reset();
       renderEmployees();
@@ -1552,9 +1951,6 @@
       await logAudit('تسجيل سلفة', `سلفة بمبلغ ${amount} للموظف: ${emp ? emp.name : ''}`);
     });
 
-    // ==========================================================================
-    // تسجيل خصم
-    // ==========================================================================
     async function openDeductionModal() {
       const emps = await DataService.getAll('Employees');
       const sel = document.getElementById('ded-emp-id');
@@ -1568,28 +1964,16 @@
       const amount = parseFloat(document.getElementById('ded-amount').value);
       const type = document.getElementById('ded-type').value;
       const desc = document.getElementById('ded-desc').value || type;
-      
       const emp = await DataService.getById('Employees', empId);
-      
       await DataService.add('EmployeeTransactions', {
-        empId: empId,
-        empName: emp ? emp.name : '',
-        type: 'خصم',
-        subType: type,
-        amount: amount,
-        desc: desc,
-        date: new Date().toLocaleString('ar-EG')
+        empId, empName: emp ? emp.name : '', type: 'خصم', subType: type, amount, desc, date: new Date().toLocaleString('ar-EG')
       });
-      
       const transactions = await DataService.getAll('EmployeeTransactions');
       const empTransactions = transactions.filter(t => t.empId === empId);
-      const totalExtra = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
-      
       if (emp) {
-        emp.totalExtraDeductions = totalExtra;
+        emp.totalExtraDeductions = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
         await DataService.update('Employees', emp);
       }
-      
       closeModal('deduction-modal');
       document.getElementById('deduction-form').reset();
       renderEmployees();
@@ -1597,23 +1981,12 @@
       await logAudit('تسجيل خصم', `خصم بمبلغ ${amount} للموظف: ${emp ? emp.name : ''}`);
     });
 
-    // ==========================================================================
-    // تسجيل غياب
-    // ==========================================================================
     async function openAbsenceModal() {
       const emps = await DataService.getAll('Employees');
       const sel = document.getElementById('abs-emp-id');
       sel.innerHTML = emps.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
-      
-      // تحديث قيمة اليومية عند اختيار موظف
-      document.getElementById('abs-emp-id').addEventListener('change', function() {
-        updateAbsenceDailyRate();
-      });
-      
-      document.getElementById('abs-days').addEventListener('input', function() {
-        updateAbsenceTotal();
-      });
-      
+      document.getElementById('abs-emp-id').addEventListener('change', updateAbsenceDailyRate);
+      document.getElementById('abs-days').addEventListener('input', updateAbsenceTotal);
       document.getElementById('absence-modal').classList.add('active');
       updateAbsenceDailyRate();
     }
@@ -1623,8 +1996,7 @@
       if (!empId) return;
       const emp = await DataService.getById('Employees', empId);
       if (emp) {
-        const dailyRate = (emp.salary || 0) / 30;
-        document.getElementById('abs-daily-rate').value = dailyRate.toFixed(2);
+        document.getElementById('abs-daily-rate').value = ((emp.salary || 0) / 30).toFixed(2);
         updateAbsenceTotal();
       }
     }
@@ -1632,8 +2004,7 @@
     function updateAbsenceTotal() {
       const dailyRate = parseFloat(document.getElementById('abs-daily-rate').value) || 0;
       const days = parseInt(document.getElementById('abs-days').value) || 0;
-      const total = dailyRate * days;
-      document.getElementById('abs-total').value = total.toFixed(2);
+      document.getElementById('abs-total').value = (dailyRate * days).toFixed(2);
     }
 
     document.getElementById('absence-form').addEventListener('submit', async (e) => {
@@ -1642,29 +2013,17 @@
       const days = parseInt(document.getElementById('abs-days').value);
       const reason = document.getElementById('abs-reason').value;
       const total = parseFloat(document.getElementById('abs-total').value) || 0;
-      
       const emp = await DataService.getById('Employees', empId);
-      
       await DataService.add('EmployeeTransactions', {
-        empId: empId,
-        empName: emp ? emp.name : '',
-        type: 'غياب',
-        subType: reason,
-        days: days,
-        amount: total,
-        desc: `غياب ${days} يوم - ${reason}`,
-        date: new Date().toLocaleString('ar-EG')
+        empId, empName: emp ? emp.name : '', type: 'غياب', subType: reason, days, amount: total, 
+        desc: `غياب ${days} يوم - ${reason}`, date: new Date().toLocaleString('ar-EG')
       });
-      
       const transactions = await DataService.getAll('EmployeeTransactions');
       const empTransactions = transactions.filter(t => t.empId === empId);
-      const totalExtra = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
-      
       if (emp) {
-        emp.totalExtraDeductions = totalExtra;
+        emp.totalExtraDeductions = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
         await DataService.update('Employees', emp);
       }
-      
       closeModal('absence-modal');
       document.getElementById('absence-form').reset();
       renderEmployees();
@@ -1672,9 +2031,6 @@
       await logAudit('تسجيل غياب', `غياب ${days} يوم للموظف: ${emp ? emp.name : ''}`);
     });
 
-    // ==========================================================================
-    // تسجيل مصروف موظف
-    // ==========================================================================
     async function openEmployeeExpenseModal() {
       const emps = await DataService.getAll('Employees');
       const sel = document.getElementById('exp-emp-id');
@@ -1688,28 +2044,16 @@
       const amount = parseFloat(document.getElementById('exp-emp-amount').value);
       const type = document.getElementById('exp-emp-type').value;
       const desc = document.getElementById('exp-emp-desc').value || type;
-      
       const emp = await DataService.getById('Employees', empId);
-      
       await DataService.add('EmployeeTransactions', {
-        empId: empId,
-        empName: emp ? emp.name : '',
-        type: 'مصروف',
-        subType: type,
-        amount: amount,
-        desc: desc,
-        date: new Date().toLocaleString('ar-EG')
+        empId, empName: emp ? emp.name : '', type: 'مصروف', subType: type, amount, desc, date: new Date().toLocaleString('ar-EG')
       });
-      
       const transactions = await DataService.getAll('EmployeeTransactions');
       const empTransactions = transactions.filter(t => t.empId === empId);
-      const totalExtra = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
-      
       if (emp) {
-        emp.totalExtraDeductions = totalExtra;
+        emp.totalExtraDeductions = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
         await DataService.update('Employees', emp);
       }
-      
       closeModal('employee-expense-modal');
       document.getElementById('employee-expense-form').reset();
       renderEmployees();
@@ -1717,9 +2061,6 @@
       await logAudit('تسجيل مصروف موظف', `مصروف بمبلغ ${amount} للموظف: ${emp ? emp.name : ''}`);
     });
 
-    // ==========================================================================
-    // عرض الموظفين
-    // ==========================================================================
     async function renderEmployees() {
       const emps = await DataService.getAll('Employees');
       document.getElementById('employees-table-body').innerHTML = emps.map((e, index) => {
@@ -1731,7 +2072,7 @@
           <td>${salary.base} ج.م</td>
           <td>${salary.dailyRate.toFixed(2)} ج.م</td>
           <td>${salary.totalAllowances} ج.م</td>
-          <td style="color:var(--danger-color);">${salary.totalBaseDeductions + salary.extraDeductions} ج.م</td>
+          <td style="color:var(--danger-color);">${(salary.totalBaseDeductions + salary.extraDeductions).toFixed(2)} ج.م</td>
           <td style="font-weight:bold; color:var(--accent-color);">${salary.netSalary.toFixed(2)} ج.م</td>
           <td>
             <button class="btn btn-warning" onclick="editEmployee(${e.id})">تعديل</button>
@@ -1741,9 +2082,6 @@
       }).join('');
     }
 
-    // ==========================================================================
-    // عرض معاملات الموظفين (سجل الخصومات والغياب والمصروفات)
-    // ==========================================================================
     async function renderEmployeeTransactions() {
       const transactions = await DataService.getAll('EmployeeTransactions');
       document.getElementById('employee-transactions-body').innerHTML = transactions.reverse().map(t => {
@@ -1752,155 +2090,90 @@
         else if (t.type === 'سلفة') badgeClass = 'badge-warning';
         else if (t.type === 'غياب') badgeClass = 'badge-info';
         else if (t.type === 'مصروف') badgeClass = 'badge-secondary';
-        
         return `<tr>
           <td>${t.date}</td>
           <td>${t.empName}</td>
           <td><span class="badge ${badgeClass}">${t.type}${t.subType ? ' - ' + t.subType : ''}</span></td>
-          <td style="color:var(--danger-color);">${t.amount || 0} ج.م${t.days ? ' (${t.days} يوم)' : ''}</td>
+          <td style="color:var(--danger-color);">${t.amount || 0} ج.م${t.days ? ' (' + t.days + ' يوم)' : ''}</td>
           <td>${t.desc || ''}</td>
           <td><button class="btn btn-danger" onclick="deleteEmployeeTransaction(${t.id})">حذف</button></td>
         </tr>`;
       }).join('');
     }
 
-    // ==========================================================================
-    // حذف معاملة موظف
-    // ==========================================================================
     async function deleteEmployeeTransaction(id) {
-      if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('الحذف متاح فقط للكنترول!');
-      }
+      if (currentUser.role !== 'المدير المالي (الكنترول)') return alert('الحذف متاح فقط للكنترول!');
       if (!confirm('هل أنت متأكد من حذف هذه المعاملة؟')) return;
-      
       const trans = await DataService.getById('EmployeeTransactions', id);
       await DataService.delete('EmployeeTransactions', id);
-      
-      // تحديث الخصومات الإضافية للموظف
       if (trans) {
         const transactions = await DataService.getAll('EmployeeTransactions');
         const empTransactions = transactions.filter(t => t.empId === trans.empId);
         const totalExtra = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
-        
         const emp = await DataService.getById('Employees', trans.empId);
         if (emp) {
           emp.totalExtraDeductions = totalExtra;
           await DataService.update('Employees', emp);
         }
       }
-      
       renderEmployees();
       renderEmployeeTransactions();
       await logAudit('حذف معاملة موظف', `حذف معاملة #${id}`);
     }
 
-    // ==========================================================================
-    // حذف موظف
-    // ==========================================================================
     async function deleteEmployee(id) {
-      if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('الحذف متاح فقط للكنترول!');
-      }
+      if (currentUser.role !== 'المدير المالي (الكنترول)') return alert('الحذف متاح فقط للكنترول!');
       if (!confirm('هل أنت متأكد من حذف هذا الموظف؟')) return;
-      
-      // حذف معاملات الموظف
       const transactions = await DataService.getAll('EmployeeTransactions');
       for (let t of transactions) {
-        if (t.empId === id) {
-          await DataService.delete('EmployeeTransactions', t.id);
-        }
+        if (t.empId === id) await DataService.delete('EmployeeTransactions', t.id);
       }
-      
       await DataService.delete('Employees', id);
       renderEmployees();
       renderEmployeeTransactions();
       await logAudit('حذف موظف', `حذف موظف رقم #${id}`);
     }
 
-    // ==========================================================================
-    // طباعة تقرير الموظفين
-    // ==========================================================================
     async function printEmployeesReport() {
       const emps = await DataService.getAll('Employees');
-      if (emps.length === 0) {
-        return alert('لا يوجد موظفين لعرض تقرير عنهم!');
-      }
-      
-      let tableRows = emps.map((e, index) => {
+      if (emps.length === 0) return alert('لا يوجد موظفين!');
+      let tableRows = emps.map((e, i) => {
         const salary = calculateSalary(e);
-        return `<tr>
-          <td>${index + 1}</td>
-          <td>${e.name}</td>
-          <td>${e.date}</td>
-          <td>${salary.base}</td>
-          <td>${salary.dailyRate.toFixed(2)}</td>
-          <td>${salary.totalAllowances}</td>
-          <td>${salary.totalBaseDeductions + salary.extraDeductions}</td>
-          <td><strong>${salary.netSalary.toFixed(2)}</strong></td>
-        </tr>`;
+        return `<tr><td>${i+1}</td><td>${e.name}</td><td>${e.date}</td><td>${salary.base}</td>
+          <td>${salary.dailyRate.toFixed(2)}</td><td>${salary.totalAllowances}</td>
+          <td>${(salary.totalBaseDeductions + salary.extraDeductions).toFixed(2)}</td>
+          <td><strong>${salary.netSalary.toFixed(2)}</strong></td></tr>`;
       }).join('');
-      
       const totalSalaries = emps.reduce((sum, e) => sum + calculateSalary(e).netSalary, 0);
-      
       const printArea = document.getElementById('print-area');
       printArea.innerHTML = `
         <div class="print-report">
-          <div class="header">
-            <h1>أبو السعود علام</h1>
-            <h2>تقرير الرواتب والأجور</h2>
-            <p>التاريخ: ${new Date().toLocaleString('ar-EG')}</p>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>اسم العامل</th>
-                <th>تاريخ التعيين</th>
-                <th>الراتب الأساسي</th>
-                <th>اليومية</th>
-                <th>البدلات</th>
-                <th>الخصومات</th>
-                <th>صافي الراتب</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${tableRows}
-            </tbody>
-            <tfoot>
-              <tr class="total-row">
-                <td colspan="7" style="text-align:left;">إجمالي الرواتب</td>
-                <td>${totalSalaries.toFixed(2)} ج.م</td>
-              </tr>
-            </tfoot>
+          <div class="header"><h1>أبو السعود علام</h1><h2>تقرير الرواتب والأجور</h2>
+            <p>التاريخ: ${new Date().toLocaleString('ar-EG')}</p></div>
+          <table><thead><tr><th>#</th><th>اسم العامل</th><th>تاريخ التعيين</th><th>الراتب الأساسي</th><th>اليومية</th><th>البدلات</th><th>الخصومات</th><th>صافي الراتب</th></tr></thead>
+            <tbody>${tableRows}</tbody>
+            <tfoot><tr class="total-row"><td colspan="7">إجمالي الرواتب</td><td>${totalSalaries.toFixed(2)} ج.م</td></tr></tfoot>
           </table>
-          <div style="margin-top:20px; text-align:center; font-size:12px; color:#666;">
-            تم إنشاء هذا التقرير بواسطة: ${currentUser.username}
-          </div>
+          <div style="margin-top:20px; text-align:center; font-size:12px; color:#666;">تم الإنشاء بواسطة: ${currentUser.username}</div>
         </div>
       `;
       window.print();
     }
 
     // ==========================================================================
-    // الإضافة والتعديل الأخرى
+    // باقي الدوال
     // ==========================================================================
     function openProductModal() { 
       document.getElementById('product-modal').classList.add('active');
-      generateProductCode().then(code => {
-        document.getElementById('prod-code').value = code;
-      });
+      generateProductCode().then(code => document.getElementById('prod-code').value = code);
     }
     function openPurchaseModal() { document.getElementById('purchase-modal').classList.add('active'); }
     function openTransferModal() { document.getElementById('transfer-modal').classList.add('active'); }
     function openExpenseModal() { document.getElementById('expense-modal').classList.add('active'); }
     function openAssetModal() { document.getElementById('asset-modal').classList.add('active'); }
     function openUserModal() { document.getElementById('user-modal').classList.add('active'); }
-    
-    function closeModal(id) { 
-      document.getElementById(id).classList.remove('active'); 
-    }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    // نماذج الإضافة
     document.getElementById('product-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       await DataService.add('Products', {
@@ -1982,13 +2255,9 @@
       renderUsers();
     });
 
-    // ==========================================================================
     // التعديلات الأخرى
-    // ==========================================================================
     async function editProduct(id) {
-      if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('التعديل متاح فقط للكنترول!');
-      }
+      if (currentUser.role !== 'المدير المالي (الكنترول)') return alert('التعديل متاح فقط للكنترول!');
       const item = await DataService.getById('Products', id);
       if (!item) return alert('البيانات غير موجودة!');
       document.getElementById('edit-prod-id').value = item.id;
@@ -2004,8 +2273,7 @@
       e.preventDefault();
       const id = parseInt(document.getElementById('edit-prod-id').value);
       await DataService.update('Products', {
-        id,
-        code: document.getElementById('edit-prod-code').value,
+        id, code: document.getElementById('edit-prod-code').value,
         name: document.getElementById('edit-prod-name').value,
         buyPrice: parseFloat(document.getElementById('edit-prod-buy').value),
         sellPrice: parseFloat(document.getElementById('edit-prod-sell').value),
@@ -2016,9 +2284,7 @@
     });
 
     async function editPurchase(id) {
-      if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('التعديل متاح فقط للكنترول!');
-      }
+      if (currentUser.role !== 'المدير المالي (الكنترول)') return alert('التعديل متاح فقط للكنترول!');
       const item = await DataService.getById('Purchases', id);
       if (!item) return alert('البيانات غير موجودة!');
       document.getElementById('edit-pur-id').value = item.id;
@@ -2036,8 +2302,7 @@
       const total = parseFloat(document.getElementById('edit-pur-total').value);
       const paid = parseFloat(document.getElementById('edit-pur-paid').value);
       await DataService.update('Purchases', {
-        id,
-        date: new Date().toLocaleString('ar-EG'),
+        id, date: new Date().toLocaleString('ar-EG'),
         supplier: document.getElementById('edit-pur-supplier').value,
         item: document.getElementById('edit-pur-item').value,
         total, paid, remaining: total - paid,
@@ -2048,9 +2313,7 @@
     });
 
     async function editExpense(id) {
-      if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('التعديل متاح فقط للكنترول!');
-      }
+      if (currentUser.role !== 'المدير المالي (الكنترول)') return alert('التعديل متاح فقط للكنترول!');
       const item = await DataService.getById('Expenses', id);
       if (!item) return alert('البيانات غير موجودة!');
       document.getElementById('edit-exp-id').value = item.id;
@@ -2064,8 +2327,7 @@
       e.preventDefault();
       const id = parseInt(document.getElementById('edit-exp-id').value);
       await DataService.update('Expenses', {
-        id,
-        date: new Date().toLocaleString('ar-EG'),
+        id, date: new Date().toLocaleString('ar-EG'),
         cat: document.getElementById('edit-exp-cat').value,
         amount: parseFloat(document.getElementById('edit-exp-amount').value),
         desc: document.getElementById('edit-exp-desc').value
@@ -2075,9 +2337,7 @@
     });
 
     async function editAsset(id) {
-      if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('التعديل متاح فقط للكنترول!');
-      }
+      if (currentUser.role !== 'المدير المالي (الكنترول)') return alert('التعديل متاح فقط للكنترول!');
       const item = await DataService.getById('Assets', id);
       if (!item) return alert('البيانات غير موجودة!');
       document.getElementById('edit-asset-id').value = item.id;
@@ -2091,8 +2351,7 @@
       e.preventDefault();
       const id = parseInt(document.getElementById('edit-asset-id').value);
       await DataService.update('Assets', {
-        id,
-        type: document.getElementById('edit-asset-type').value,
+        id, type: document.getElementById('edit-asset-type').value,
         desc: document.getElementById('edit-asset-desc').value,
         value: parseFloat(document.getElementById('edit-asset-value').value)
       });
@@ -2100,73 +2359,41 @@
       renderAssets();
     });
 
-    // ==========================================================================
     // عرض الجداول
-    // ==========================================================================
     async function renderInventory() {
       const list = await DataService.getAll('Products');
       document.getElementById('inventory-table-body').innerHTML = list.map(p => `
-        <tr>
-          <td>${p.code}</td>
-          <td>${p.name}</td>
-          <td>${p.qty}</td>
-          <td>${p.buyPrice}</td>
-          <td>${p.sellPrice}</td>
-          <td>
-            <button class="btn btn-warning" onclick="editProduct(${p.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteItem('Products', ${p.id})">حذف</button>
-          </td>
-        </tr>
+        <tr><td>${p.code}</td><td>${p.name}</td><td>${p.qty}</td><td>${p.buyPrice}</td><td>${p.sellPrice}</td>
+        <td><button class="btn btn-warning" onclick="editProduct(${p.id})">تعديل</button>
+        <button class="btn btn-danger" onclick="deleteItem('Products', ${p.id})">حذف</button></td></tr>
       `).join('');
     }
 
     async function renderPurchases() {
       const list = await DataService.getAll('Purchases');
       document.getElementById('purchases-table-body').innerHTML = list.map(p => `
-        <tr>
-          <td>${p.id}</td>
-          <td>${p.date}</td>
-          <td>${p.supplier}</td>
-          <td>${p.payType}</td>
-          <td>${p.paid}</td>
-          <td>${p.remaining}</td>
-          <td>${p.total}</td>
-          <td>
-            <button class="btn btn-warning" onclick="editPurchase(${p.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteItem('Purchases', ${p.id})">حذف</button>
-          </td>
-        </tr>
+        <tr><td>${p.id}</td><td>${p.date}</td><td>${p.supplier}</td><td>${p.payType}</td>
+        <td>${p.paid}</td><td>${p.remaining}</td><td>${p.total}</td>
+        <td><button class="btn btn-warning" onclick="editPurchase(${p.id})">تعديل</button>
+        <button class="btn btn-danger" onclick="deleteItem('Purchases', ${p.id})">حذف</button></td></tr>
       `).join('');
     }
 
     async function renderExpenses() {
       const list = await DataService.getAll('Expenses');
       document.getElementById('expenses-table-body').innerHTML = list.map(x => `
-        <tr>
-          <td>${x.date}</td>
-          <td>${x.cat}</td>
-          <td>${x.amount}</td>
-          <td>${x.desc}</td>
-          <td>
-            <button class="btn btn-warning" onclick="editExpense(${x.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteItem('Expenses', ${x.id})">حذف</button>
-          </td>
-        </tr>
+        <tr><td>${x.date}</td><td>${x.cat}</td><td>${x.amount}</td><td>${x.desc}</td>
+        <td><button class="btn btn-warning" onclick="editExpense(${x.id})">تعديل</button>
+        <button class="btn btn-danger" onclick="deleteItem('Expenses', ${x.id})">حذف</button></td></tr>
       `).join('');
     }
 
     async function renderAssets() {
       const list = await DataService.getAll('Assets');
       document.getElementById('assets-table-body').innerHTML = list.map(a => `
-        <tr>
-          <td>${a.type}</td>
-          <td>${a.desc}</td>
-          <td>${a.value} ج.م</td>
-          <td>
-            <button class="btn btn-warning" onclick="editAsset(${a.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteItem('Assets', ${a.id})">حذف</button>
-          </td>
-        </tr>
+        <tr><td>${a.type}</td><td>${a.desc}</td><td>${a.value} ج.م</td>
+        <td><button class="btn btn-warning" onclick="editAsset(${a.id})">تعديل</button>
+        <button class="btn btn-danger" onclick="deleteItem('Assets', ${a.id})">حذف</button></td></tr>
       `).join('');
     }
 
@@ -2185,45 +2412,35 @@
     }
 
     async function deleteItem(store, id) {
-      if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('الحذف متاح فقط للكنترول!');
-      }
-      if (confirm('هل أنت متأكد من الحذف؟')) {
-        await DataService.delete(store, id);
-        await logAudit('حذف', `حذف من ${store} رقم #${id}`);
-        const map = {
-          'Products': renderInventory,
-          'Purchases': renderPurchases,
-          'Expenses': renderExpenses,
-          'Assets': renderAssets
-        };
-        if (map[store]) map[store]();
-        else location.reload();
-      }
+      if (currentUser.role !== 'المدير المالي (الكنترول)') return alert('الحذف متاح فقط للكنترول!');
+      if (!confirm('هل أنت متأكد من الحذف؟')) return;
+      await DataService.delete(store, id);
+      await logAudit('حذف', `حذف من ${store} رقم #${id}`);
+      const map = { 'Products': renderInventory, 'Purchases': renderPurchases, 'Expenses': renderExpenses, 'Assets': renderAssets };
+      if (map[store]) map[store]();
+      else location.reload();
     }
 
     async function renderDashboard() {
       const sales = await DataService.getAll('Sales');
       const expenses = await DataService.getAll('Expenses');
       const employees = await DataService.getAll('Employees');
-      
       const totalS = sales.reduce((s, x) => s + (x.total || 0), 0);
       const totalE = expenses.reduce((s, x) => s + (x.amount || 0), 0);
       const totalSalaries = employees.reduce((s, e) => s + calculateSalary(e).netSalary, 0);
-      
+      const totalRemaining = sales.reduce((s, x) => s + (x.remaining || 0), 0);
       document.getElementById('dash-cards').innerHTML = `
         <div class="card"><h4>إجمالي المبيعات</h4><div class="value gold">${totalS} ج.م</div></div>
+        <div class="card"><h4>المستحق على العملاء</h4><div class="value danger">${totalRemaining} ج.م</div></div>
         <div class="card"><h4>إجمالي المصروفات</h4><div class="value">${totalE} ج.م</div></div>
         <div class="card"><h4>إجمالي الرواتب</h4><div class="value">${totalSalaries.toFixed(2)} ج.م</div></div>
         <div class="card"><h4>صافي الأرباح</h4><div class="value gold">${(totalS - totalE - totalSalaries).toFixed(2)} ج.م</div></div>
       `;
     }
 
-    // ==========================================================================
     // Excel
-    // ==========================================================================
     async function exportToExcelBackup() {
-      const stores = ['Sales', 'Purchases', 'Products', 'Expenses', 'Employees', 'Assets', 'AuditLogs', 'EmployeeTransactions'];
+      const stores = ['Sales', 'Purchases', 'Products', 'Expenses', 'Employees', 'Assets', 'AuditLogs', 'EmployeeTransactions', 'CustomerPayments'];
       const wb = XLSX.utils.book_new();
       for (let s of stores) {
         const data = await DataService.getAll(s);
@@ -2283,27 +2500,16 @@
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const target = link.getAttribute('data-target');
-        if (!checkPermission(target)) {
-          return alert('هذا القسم يطلب صلاحية أعلى!');
-        }
-        
+        if (!checkPermission(target)) return alert('هذا القسم يطلب صلاحية أعلى!');
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
-        
         link.classList.add('active');
         document.getElementById(target).classList.add('active');
-
-        if (target === 'sales') { 
-          if (!isNewSaleMode) {
-            renderSales();
-          }
-        }
+        if (target === 'sales') { if (!isNewSaleMode) renderSales(); }
+        if (target === 'customers') { renderCustomers(); }
         if (target === 'purchases') renderPurchases();
         if (target === 'inventory') renderInventory();
-        if (target === 'employees') {
-          renderEmployees();
-          renderEmployeeTransactions();
-        }
+        if (target === 'employees') { renderEmployees(); renderEmployeeTransactions(); }
         if (target === 'expenses') renderExpenses();
         if (target === 'assets') renderAssets();
         if (target === 'users') renderUsers();
@@ -2314,17 +2520,11 @@
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         await initDB();
-        
         const users = await DataService.getAll('Users');
         if (users.length === 0) {
           const pass = await hashPassword('admin123');
-          await DataService.add('Users', { 
-            username: 'admin', 
-            password: pass, 
-            role: 'المدير المالي (الكنترول)' 
-          });
+          await DataService.add('Users', { username: 'admin', password: pass, role: 'المدير المالي (الكنترول)' });
         }
-
         const session = sessionStorage.getItem('currentUser');
         if (session) {
           currentUser = JSON.parse(session);
@@ -2341,7 +2541,6 @@
             renderSales();
           }
         }
-
         document.getElementById('login-form').addEventListener('submit', async (e) => {
           e.preventDefault();
           const u = document.getElementById('login-username').value.trim();
