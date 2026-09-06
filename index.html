@@ -174,7 +174,6 @@
     .pos-products, .pos-cart { background: #ffffff; padding: 1rem; border-radius: 12px; display: flex; flex-direction: column; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .cart-items { flex: 1; overflow-y: auto; margin: 0.8rem 0; }
 
-    /* أنماط الطباعة */
     @media print {
       body * { visibility: hidden; }
       #print-area, #print-area * { visibility: visible; }
@@ -210,13 +209,6 @@
         font-size: 12px; 
         color: #666;
         margin: 2px 0;
-      }
-      .print-invoice .info { 
-        display: flex; 
-        justify-content: space-between; 
-        font-size: 12px;
-        margin-bottom: 5px;
-        padding: 3px 0;
       }
       .print-invoice .info-line {
         display: flex;
@@ -271,19 +263,9 @@
         padding-top: 10px;
         border-top: 1px dashed #ddd;
       }
-      .print-invoice .badge-print {
-        display: inline-block;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 10px;
-        font-weight: bold;
-        color: #fff;
-        background: #c9a84c;
-      }
       .print-report { max-width: 100%; }
       .print-report table { width: 100%; border-collapse: collapse; margin-top: 10px; }
       .print-report th, .print-report td { border: 1px solid #000; padding: 6px; text-align: right; }
-      .print-report h1, .print-report h2, .print-report h3 { text-align: center; }
       .print-report .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
       .print-report .total-row { font-weight: bold; background: #f0f0f0; }
     }
@@ -391,7 +373,7 @@
             <table>
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th>رقم الفاتورة</th>
                   <th>التاريخ</th>
                   <th>العميل</th>
                   <th>الإجمالي</th>
@@ -469,6 +451,7 @@
           <button class="btn btn-primary" onclick="openCustomerPaymentModal()">تسجيل دفعة من عميل</button>
           <button class="btn btn-success" onclick="printCustomersReport()">طباعة كشف العملاء</button>
           <button class="btn btn-info" onclick="exportCustomersToExcel()">تصدير Excel</button>
+          <button class="btn btn-secondary" onclick="renderCustomers()">تحديث</button>
         </div>
         <div class="table-responsive">
           <table>
@@ -490,7 +473,7 @@
           <h3 class="section-title">سجل مدفوعات العملاء</h3>
           <div class="table-responsive">
             <table>
-              <thead><tr><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>البيان</th><th>تحكم</th></tr></thead>
+              <thead><tr><th>التاريخ</th><th>العميل</th><th>المبلغ</th><th>طريقة الدفع</th><th>البيان</th><th>تحكم</th></tr></thead>
               <tbody id="customer-payments-body"></tbody>
             </table>
           </div>
@@ -961,10 +944,57 @@
     // محرك البيانات
     // ==========================================================================
     const DB_NAME = 'AbuSaud_ERP_DB';
-    const DB_VERSION = 11;
+    const DB_VERSION = 13;
     let dbInstance = null;
     let currentUser = null;
     let cart = [];
+
+    // ==========================================================================
+    // نظام ترقيم الفواتير (1 - 100 ثم يعيد العد)
+    // ==========================================================================
+    let invoiceCounter = 1;
+    const MAX_INVOICE_NUMBER = 100;
+
+    async function getNextInvoiceNumber() {
+      // جلب جميع الفواتير
+      const sales = await DataService.getAll('Sales');
+      
+      // إذا لم توجد فواتير، نبدأ من 1
+      if (sales.length === 0) {
+        return 1;
+      }
+      
+      // جلب آخر رقم فاتورة مستخدم
+      let maxNumber = 0;
+      sales.forEach(s => {
+        if (s.invoiceNumber && s.invoiceNumber > maxNumber) {
+          maxNumber = s.invoiceNumber;
+        }
+      });
+      
+      // إذا وصلنا للحد الأقصى (100) نرجع للرقم 1
+      let nextNumber = maxNumber + 1;
+      if (nextNumber > MAX_INVOICE_NUMBER) {
+        // نبحث عن أول رقم غير مستخدم من 1 إلى 100
+        const usedNumbers = new Set();
+        sales.forEach(s => {
+          if (s.invoiceNumber) {
+            usedNumbers.add(s.invoiceNumber);
+          }
+        });
+        
+        // نبحث عن أول رقم غير مستخدم
+        for (let i = 1; i <= MAX_INVOICE_NUMBER; i++) {
+          if (!usedNumbers.has(i)) {
+            return i;
+          }
+        }
+        // إذا كانت كل الأرقام مستخدمة، نبدأ من 1 (يعيد العد)
+        return 1;
+      }
+      
+      return nextNumber;
+    }
 
     async function hashPassword(p) {
       const enc = new TextEncoder().encode(p);
@@ -1229,7 +1259,11 @@
       const paid = parseFloat(document.getElementById('pos-paid').value) || 0;
       const remaining = Math.max(0, total - paid);
       
+      // الحصول على رقم الفاتورة التالي
+      const invoiceNumber = await getNextInvoiceNumber();
+      
       const saleData = {
+        invoiceNumber: invoiceNumber,
         date: new Date().toLocaleString('ar-EG'),
         customer: customer,
         items: JSON.parse(JSON.stringify(cart)),
@@ -1242,7 +1276,7 @@
       };
 
       await DataService.add('Sales', saleData);
-      await logAudit('إصدار فاتورة مبيعات', `فاتورة بمبلغ ${total} - العميل: ${customer} - المدفوع: ${paid} - المتبقي: ${remaining}`);
+      await logAudit('إصدار فاتورة مبيعات', `فاتورة #${invoiceNumber} - بمبلغ ${total} - العميل: ${customer} - المدفوع: ${paid} - المتبقي: ${remaining}`);
 
       for (let item of cart) {
         if (typeof item.id === 'number') {
@@ -1259,7 +1293,7 @@
           customer: customer,
           amount: paid,
           method: 'نقدي',
-          desc: `دفعة على فاتورة`,
+          desc: `دفعة على فاتورة #${invoiceNumber}`,
           date: new Date().toLocaleString('ar-EG'),
           saleId: saleData.id
         });
@@ -1296,7 +1330,7 @@
           <div class="header">
             <h1>أبو السعود علام</h1>
             <p>فاتورة مبيعات</p>
-            <p style="font-size:11px; color:#666;">رقم الفاتورة: #${Date.now().toString().slice(-6)}</p>
+            <p style="font-size:11px; color:#666;">رقم الفاتورة: #${String(saleData.invoiceNumber).padStart(3, '0')}</p>
           </div>
           
           <div class="info-line">
@@ -1362,7 +1396,7 @@
       const list = await DataService.getAll('Sales');
       document.getElementById('sales-table-body').innerHTML = list.reverse().map(s => `
         <tr>
-          <td>${s.id}</td>
+          <td><strong>#${String(s.invoiceNumber || s.id).padStart(3, '0')}</strong></td>
           <td>${s.date}</td>
           <td>${s.customer || 'عميل نقدي'}</td>
           <td>${s.total} ج.م</td>
@@ -1507,6 +1541,7 @@
       
       await DataService.update('Sales', {
         id: id,
+        invoiceNumber: oldSale ? oldSale.invoiceNumber : (await getNextInvoiceNumber()),
         date: oldSale ? oldSale.date : new Date().toLocaleString('ar-EG'),
         customer: customer,
         items: editCartItems,
@@ -1521,7 +1556,7 @@
         editDate: new Date().toLocaleString('ar-EG')
       });
       
-      await logAudit('تعديل فاتورة مبيعات', `تعديل فاتورة #${id} - العميل: ${customer}`);
+      await logAudit('تعديل فاتورة مبيعات', `تعديل فاتورة #${oldSale ? oldSale.invoiceNumber : ''} - العميل: ${customer}`);
       closeModal('edit-sale-modal');
       renderSales();
       renderInventory();
@@ -1548,13 +1583,13 @@
       }
       
       await DataService.delete('Sales', id);
-      await logAudit('حذف فاتورة مبيعات', `حذف فاتورة #${id}`);
+      await logAudit('حذف فاتورة مبيعات', `حذف فاتورة #${sale ? sale.invoiceNumber : id}`);
       renderSales();
       renderInventory();
     }
 
     // ==========================================================================
-    // العملاء - كشوف الآجل
+    // العملاء - كشوف الآجل و سجل المدفوعات
     // ==========================================================================
     async function renderCustomers() {
       const sales = await DataService.getAll('Sales');
@@ -1601,6 +1636,60 @@
           </td>
         </tr>`;
       }).join('');
+      
+      renderCustomerPayments();
+    }
+
+    // ==========================================================================
+    // عرض سجل مدفوعات العملاء
+    // ==========================================================================
+    async function renderCustomerPayments() {
+      const payments = await DataService.getAll('CustomerPayments');
+      document.getElementById('customer-payments-body').innerHTML = payments.reverse().map(p => `
+        <tr>
+          <td>${p.date}</td>
+          <td>${p.customer}</td>
+          <td style="color:var(--success-color); font-weight:bold;">${p.amount} ج.م</td>
+          <td>${p.method || 'نقدي'}</td>
+          <td>${p.desc || ''}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" onclick="deleteCustomerPayment(${p.id})">حذف</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ==========================================================================
+    // حذف دفعة عميل
+    // ==========================================================================
+    async function deleteCustomerPayment(id) {
+      if (currentUser.role !== 'المدير المالي (الكنترول)') {
+        return alert('الحذف متاح فقط للكنترول!');
+      }
+      if (!confirm('هل أنت متأكد من حذف هذه الدفعة؟')) return;
+      
+      const payment = await DataService.getById('CustomerPayments', id);
+      await DataService.delete('CustomerPayments', id);
+      
+      if (payment) {
+        const sales = await DataService.getAll('Sales');
+        let remainingAmount = payment.amount;
+        const customerSales = sales
+          .filter(s => s.customer === payment.customer && (s.remaining || 0) > 0)
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        for (let sale of customerSales) {
+          if (remainingAmount <= 0) break;
+          const payBack = Math.min(remainingAmount, sale.paid || 0);
+          sale.paid = (sale.paid || 0) - payBack;
+          sale.remaining = (sale.remaining || 0) + payBack;
+          await DataService.update('Sales', sale);
+          remainingAmount -= payBack;
+        }
+      }
+      
+      renderCustomers();
+      await logAudit('حذف دفعة عميل', `حذف دفعة #${id}`);
     }
 
     // ==========================================================================
@@ -1627,6 +1716,7 @@
           customersMap[key].totalPaid += s.paid || 0;
           customersMap[key].count++;
           customersMap[key].sales.push({
+            invoiceNumber: s.invoiceNumber || s.id,
             date: s.date,
             total: s.total,
             paid: s.paid,
@@ -1649,7 +1739,6 @@
         return alert('لا يوجد عملاء آجل لتصديرهم!');
       }
       
-      // إعداد البيانات للتصدير
       const excelData = [];
       customers.forEach((c, index) => {
         const remaining = c.totalSales - c.totalPaid;
@@ -1661,18 +1750,16 @@
           'المتبقي': remaining,
           'عدد الفواتير': c.count
         });
-        // إضافة تفاصيل الفواتير لكل عميل
         c.sales.forEach(s => {
           excelData.push({
             '#': '',
-            'اسم العميل': `  └─ فاتورة`,
+            'اسم العميل': `  └─ فاتورة #${String(s.invoiceNumber).padStart(3, '0')}`,
             'إجمالي المشتريات': s.total,
             'إجمالي المدفوع': s.paid,
             'المتبقي': s.remaining,
             'عدد الفواتير': s.date
           });
         });
-        // إضافة سطر فارغ بين العملاء
         excelData.push({
           '#': '',
           'اسم العميل': '---',
@@ -1683,7 +1770,6 @@
         });
       });
       
-      // إضافة إجمالي المستحق
       const totalRemaining = customers.reduce((sum, c) => sum + (c.totalSales - c.totalPaid), 0);
       excelData.push({
         '#': '',
@@ -1697,7 +1783,6 @@
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(excelData);
       
-      // تعيين عرض الأعمدة
       ws['!cols'] = [
         { wch: 5 },
         { wch: 25 },
@@ -1730,7 +1815,7 @@
           <hr>
         </div>
         <table>
-          <thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>البيان</th></tr></thead>
+          <thead><tr><th>رقم الفاتورة</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>البيان</th></tr></thead>
           <tbody>
       `;
       
@@ -1740,16 +1825,18 @@
       customerSales.forEach(s => {
         totalSales += s.total || 0;
         html += `<tr>
+          <td>#${String(s.invoiceNumber || s.id).padStart(3, '0')}</td>
           <td>${s.date}</td>
           <td><span class="badge badge-warning">فاتورة</span></td>
           <td>${s.total} ج.م</td>
-          <td>فاتورة #${s.id}</td>
+          <td>فاتورة</td>
         </tr>`;
       });
       
       customerPayments.forEach(p => {
         totalPaid += p.amount || 0;
         html += `<tr>
+          <td>-</td>
           <td>${p.date}</td>
           <td><span class="badge badge-success">دفعة</span></td>
           <td style="color:var(--success-color);">${p.amount} ج.م</td>
@@ -1763,17 +1850,17 @@
           </tbody>
           <tfoot>
             <tr class="total-row">
-              <td colspan="2" style="text-align:left;">إجمالي المشتريات</td>
+              <td colspan="3" style="text-align:left;">إجمالي المشتريات</td>
               <td>${totalSales} ج.م</td>
               <td></td>
             </tr>
             <tr class="total-row">
-              <td colspan="2" style="text-align:left;">إجمالي المدفوع</td>
+              <td colspan="3" style="text-align:left;">إجمالي المدفوع</td>
               <td style="color:var(--success-color);">${totalPaid} ج.م</td>
               <td></td>
             </tr>
             <tr class="total-row">
-              <td colspan="2" style="text-align:left; font-size:1.1rem;">المتبقي</td>
+              <td colspan="3" style="text-align:left; font-size:1.1rem;">المتبقي</td>
               <td style="color:${remaining > 0 ? 'var(--danger-color)' : 'var(--success-color)'}; font-size:1.2rem; font-weight:bold;">${remaining} ج.م</td>
               <td></td>
             </tr>
@@ -1794,10 +1881,10 @@
       const printArea = document.getElementById('print-area');
       let tableRows = '';
       data.customerSales.forEach(s => {
-        tableRows += `<tr><td>${s.date}</td><td>فاتورة</td><td>${s.total} ج.م</td><td>فاتورة #${s.id}</td></tr>`;
+        tableRows += `<tr><td>#${String(s.invoiceNumber || s.id).padStart(3, '0')}</td><td>${s.date}</td><td>فاتورة</td><td>${s.total} ج.م</td><td></td></tr>`;
       });
       data.customerPayments.forEach(p => {
-        tableRows += `<tr><td>${p.date}</td><td>دفعة</td><td style="color:green;">${p.amount} ج.م</td><td>${p.desc || ''}</td></tr>`;
+        tableRows += `<tr><td>-</td><td>${p.date}</td><td>دفعة</td><td style="color:green;">${p.amount} ج.م</td><td>${p.desc || ''}</td></tr>`;
       });
       
       printArea.innerHTML = `
@@ -1811,12 +1898,12 @@
             <h4>${data.name}</h4>
           </div>
           <table>
-            <thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>البيان</th></tr></thead>
+            <thead><tr><th>رقم الفاتورة</th><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>البيان</th></tr></thead>
             <tbody>${tableRows}</tbody>
             <tfoot>
-              <tr class="total-row"><td colspan="2">إجمالي المشتريات</td><td>${data.totalSales} ج.م</td><td></td></tr>
-              <tr class="total-row"><td colspan="2">إجمالي المدفوع</td><td style="color:green;">${data.totalPaid} ج.م</td><td></td></tr>
-              <tr class="total-row" style="font-size:1.2rem;"><td colspan="2">المتبقي</td><td style="color:${data.remaining > 0 ? '#dc3545' : '#28a745'}; font-weight:bold;">${data.remaining} ج.م</td><td></td></tr>
+              <tr class="total-row"><td colspan="3">إجمالي المشتريات</td><td>${data.totalSales} ج.م</td><td></td></tr>
+              <tr class="total-row"><td colspan="3">إجمالي المدفوع</td><td style="color:green;">${data.totalPaid} ج.م</td><td></td></tr>
+              <tr class="total-row" style="font-size:1.2rem;"><td colspan="3">المتبقي</td><td style="color:${data.remaining > 0 ? '#dc3545' : '#28a745'}; font-weight:bold;">${data.remaining} ج.م</td><td></td></tr>
             </tfoot>
           </table>
           <div style="margin-top:20px; text-align:center; font-size:12px; color:#666;">
@@ -1885,8 +1972,10 @@
       
       closeModal('customer-payment-modal');
       document.getElementById('customer-payment-form').reset();
+      
       renderCustomers();
       renderSales();
+      
       await logAudit('تسجيل دفعة عميل', `دفعة بمبلغ ${amount} من العميل: ${customer}`);
       alert('تم تسجيل الدفعة بنجاح!');
     });
