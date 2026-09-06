@@ -102,6 +102,8 @@
     .card h4 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
     .card .value { font-size: 1.5rem; font-weight: bold; color: var(--text-main); }
     .card .value.gold { color: var(--accent-color); }
+    .card .value.success { color: var(--success-color); }
+    .card .value.danger { color: var(--danger-color); }
 
     .form-group { margin-bottom: 0.9rem; }
     .form-group label { display: block; margin-bottom: 0.3rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; }
@@ -136,6 +138,8 @@
     .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4); }
     .btn-info { background: linear-gradient(135deg, #17a2b8, #0dcaf0); color: #fff; }
     .btn-info:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(23, 162, 184, 0.4); }
+    .btn-secondary { background: #6c757d; color: #fff; }
+    .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4); }
 
     .table-responsive { 
       width: 100%; 
@@ -172,10 +176,13 @@
     @media print {
       body * { visibility: hidden; }
       #print-area, #print-area * { visibility: visible; }
-      #print-area { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; padding: 15px; }
-      .thermal-80mm { width: 80mm; font-size: 11px; }
-      table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-      th, td { border: 1px solid #000; padding: 4px; text-align: right; }
+      #print-area { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; padding: 20px; }
+      .print-report { max-width: 100%; }
+      .print-report table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+      .print-report th, .print-report td { border: 1px solid #000; padding: 6px; text-align: right; }
+      .print-report h1, .print-report h2, .print-report h3 { text-align: center; }
+      .print-report .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+      .print-report .total-row { font-weight: bold; background: #f0f0f0; }
     }
 
     .brand-title {
@@ -186,20 +193,20 @@
       -webkit-text-fill-color: transparent;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
-    .brand-subtitle {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      -webkit-text-fill-color: var(--text-muted);
-    }
     .section-title {
       color: var(--accent-color);
       border-bottom: 2px solid var(--accent-color);
       padding-bottom: 0.5rem;
       margin-bottom: 1rem;
     }
-    .edit-cart-item { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
-    .edit-cart-item input { width: 60px; padding: 3px; border-radius: 4px; border: 1px solid var(--border-color); text-align: center; }
+    .salary-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .salary-details .deductions { border-right: 3px solid var(--danger-color); padding-right: 10px; }
+    .salary-details .allowances { border-right: 3px solid var(--success-color); padding-right: 10px; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; }
+    .badge-success { background: #d4edda; color: #155724; }
+    .badge-danger { background: #f8d7da; color: #721c24; }
+    .badge-warning { background: #fff3cd; color: #856404; }
+    .badge-info { background: #d1ecf1; color: #0c5460; }
   </style>
 </head>
 <body>
@@ -229,10 +236,10 @@
     <ul class="sidebar-nav">
       <li><a data-target="dashboard" class="nav-link active">الرئيسية</a></li>
       <li><a data-target="sales" class="nav-link">المبيعات والفاتورة</a></li>
-      <li><a data-target="purchases" class="nav-link">المشتريات وكشوف الحساب</a></li>
-      <li><a data-target="inventory" class="nav-link">المخازن والتحويلات</a></li>
+      <li><a data-target="purchases" class="nav-link">المشتريات</a></li>
+      <li><a data-target="inventory" class="nav-link">المخازن</a></li>
       <li><a data-target="employees" class="nav-link">الأجور والرواتب</a></li>
-      <li><a data-target="expenses" class="nav-link">المصروفات التفصيلية</a></li>
+      <li><a data-target="expenses" class="nav-link">المصروفات</a></li>
       <li><a data-target="assets" class="nav-link">الحسابات والأصول</a></li>
       <li><a data-target="reports" class="nav-link">التقارير المالية</a></li>
       <li><a data-target="users" class="nav-link">إدارة المستخدمين</a></li>
@@ -348,16 +355,42 @@
       </section>
 
       <section id="employees" class="section-view">
-        <h2 class="section-title">إدارة أجور ورواتب الموظفين والسلف</h2>
+        <h2 class="section-title">إدارة أجور ورواتب الموظفين</h2>
         <div style="display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="openEmployeeModal()">إضافة موظف جديد</button>
-          <button class="btn btn-warning" onclick="openAdvanceModal()">تسجيل سلفة موظف</button>
+          <button class="btn btn-warning" onclick="openAdvanceModal()">تسجيل سلفة</button>
+          <button class="btn btn-danger" onclick="openDeductionModal()">تسجيل خصم</button>
+          <button class="btn btn-info" onclick="openAbsenceModal()">تسجيل غياب</button>
+          <button class="btn btn-secondary" onclick="openEmployeeExpenseModal()">تسجيل مصروف موظف</button>
+          <button class="btn btn-success" onclick="printEmployeesReport()">طباعة التقرير</button>
         </div>
         <div class="table-responsive">
           <table>
-            <thead><tr><th>اسم العامل</th><th>تاريخ التعيين</th><th>الراتب</th><th>إجمالي السلف</th><th>صافي المرتب</th><th>تحكم</th></tr></thead>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>اسم العامل</th>
+                <th>تاريخ التعيين</th>
+                <th>الراتب الأساسي</th>
+                <th>اليومية</th>
+                <th>البدلات</th>
+                <th>الخصومات</th>
+                <th>صافي الراتب</th>
+                <th>تحكم</th>
+              </tr>
+            </thead>
             <tbody id="employees-table-body"></tbody>
           </table>
+        </div>
+        <!-- سجل الخصومات والغياب والمصروفات -->
+        <div style="margin-top:20px;">
+          <h3 class="section-title">سجل الخصومات والغياب والمصروفات</h3>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>التاريخ</th><th>الموظف</th><th>النوع</th><th>المبلغ</th><th>البيان</th><th>تحكم</th></tr></thead>
+              <tbody id="employee-transactions-body"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -433,20 +466,172 @@
 
   <div id="print-area"></div>
 
-  <!-- نافذة تعديل الفاتورة -->
+  <!-- ==================== نوافذ الموظفين ==================== -->
+
+  <!-- نافذة إضافة موظف -->
+  <div id="employee-modal" class="modal">
+    <div class="modal-content">
+      <h3>إضافة موظف جديد</h3>
+      <form id="employee-form">
+        <div class="form-group"><label>اسم العامل</label><input type="text" id="emp-name" class="form-control" required></div>
+        <div class="form-group"><label>تاريخ التعيين</label><input type="date" id="emp-date" class="form-control" required></div>
+        <div class="form-group"><label>الراتب الأساسي (شهري)</label><input type="number" id="emp-salary" class="form-control" required></div>
+        <button type="submit" class="btn btn-success">حفظ</button>
+        <button type="button" class="btn btn-danger" onclick="closeModal('employee-modal')">إلغاء</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة تعديل الموظف -->
+  <div id="edit-employee-modal" class="modal">
+    <div class="modal-content">
+      <h3>تعديل بيانات موظف - تفاصيل الراتب</h3>
+      <form id="edit-employee-form">
+        <input type="hidden" id="edit-emp-id">
+        <div class="form-group"><label>اسم العامل</label><input type="text" id="edit-emp-name" class="form-control" required></div>
+        <div class="form-group"><label>تاريخ التعيين</label><input type="date" id="edit-emp-date" class="form-control" required></div>
+        <div class="form-group"><label>الراتب الأساسي</label><input type="number" id="edit-emp-salary" class="form-control" required></div>
+        
+        <div class="salary-details">
+          <div class="allowances">
+            <h4 style="color:var(--success-color); font-size:0.95rem;">البدلات والإضافات</h4>
+            <div class="form-group"><label>بدل انتقال</label><input type="number" id="edit-emp-transport" class="form-control" value="0"></div>
+            <div class="form-group"><label>بدل سكن</label><input type="number" id="edit-emp-housing" class="form-control" value="0"></div>
+            <div class="form-group"><label>مكافأة</label><input type="number" id="edit-emp-bonus" class="form-control" value="0"></div>
+            <div class="form-group"><label>عمولة</label><input type="number" id="edit-emp-commission" class="form-control" value="0"></div>
+            <div class="form-group"><label>بدلات أخرى</label><input type="number" id="edit-emp-other-allowance" class="form-control" value="0"></div>
+          </div>
+          <div class="deductions">
+            <h4 style="color:var(--danger-color); font-size:0.95rem;">الخصومات الأساسية</h4>
+            <div class="form-group"><label>تأمينات</label><input type="number" id="edit-emp-insurance" class="form-control" value="0"></div>
+            <div class="form-group"><label>خصم ثابت</label><input type="number" id="edit-emp-fixed-deduction" class="form-control" value="0"></div>
+          </div>
+        </div>
+        
+        <div style="background:var(--bg-secondary); padding:15px; border-radius:8px; margin:10px 0;">
+          <h4 style="color:var(--accent-color);">ملخص الراتب</h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:10px;">
+            <div><strong>إجمالي البدلات:</strong> <span id="edit-total-allowances">0</span> ج.م</div>
+            <div><strong>الخصومات الأساسية:</strong> <span id="edit-total-deductions">0</span> ج.م</div>
+            <div><strong style="color:var(--accent-color);">صافي الراتب:</strong> <span id="edit-net-salary">0</span> ج.م</div>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn btn-success">تحديث الموظف</button>
+        <button type="button" class="btn btn-danger" onclick="closeModal('edit-employee-modal')">إلغاء</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة تسجيل سلفة -->
+  <div id="advance-modal" class="modal">
+    <div class="modal-content">
+      <h3>تسجيل سلفة موظف</h3>
+      <form id="advance-form">
+        <div class="form-group">
+          <label>الموظف</label>
+          <select id="adv-emp-id" class="form-control" required></select>
+        </div>
+        <div class="form-group"><label>مبلغ السلفة</label><input type="number" id="adv-amount" class="form-control" required></div>
+        <div class="form-group"><label>البيان (اختياري)</label><input type="text" id="adv-desc" class="form-control" placeholder="سبب السلفة"></div>
+        <button type="submit" class="btn btn-success">تسجيل</button>
+        <button type="button" class="btn btn-danger" onclick="closeModal('advance-modal')">إلغاء</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة تسجيل خصم -->
+  <div id="deduction-modal" class="modal">
+    <div class="modal-content">
+      <h3>تسجيل خصم للموظف</h3>
+      <form id="deduction-form">
+        <div class="form-group">
+          <label>الموظف</label>
+          <select id="ded-emp-id" class="form-control" required></select>
+        </div>
+        <div class="form-group"><label>مبلغ الخصم</label><input type="number" id="ded-amount" class="form-control" required></div>
+        <div class="form-group"><label>سبب الخصم</label>
+          <select id="ded-type" class="form-control" required>
+            <option value="مخالفة">مخالفة</option>
+            <option value="تأخير">تأخير</option>
+            <option value="تلفيات">تلفيات</option>
+            <option value="خصم أدوات">خصم أدوات</option>
+            <option value="خصم آخر">خصم آخر</option>
+          </select>
+        </div>
+        <div class="form-group"><label>البيان</label><input type="text" id="ded-desc" class="form-control" placeholder="تفاصيل الخصم"></div>
+        <button type="submit" class="btn btn-danger">تسجيل الخصم</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal('deduction-modal')">إلغاء</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة تسجيل غياب -->
+  <div id="absence-modal" class="modal">
+    <div class="modal-content">
+      <h3>تسجيل غياب للموظف</h3>
+      <form id="absence-form">
+        <div class="form-group">
+          <label>الموظف</label>
+          <select id="abs-emp-id" class="form-control" required></select>
+        </div>
+        <div class="form-group"><label>عدد أيام الغياب</label><input type="number" id="abs-days" class="form-control" required min="1"></div>
+        <div class="form-group"><label>قيمة اليومية (تحسب تلقائياً)</label>
+          <input type="number" id="abs-daily-rate" class="form-control" readonly style="background:#f0f0f0;">
+        </div>
+        <div class="form-group"><label>إجمالي خصم الغياب</label>
+          <input type="number" id="abs-total" class="form-control" readonly style="background:#f0f0f0;">
+        </div>
+        <div class="form-group"><label>سبب الغياب</label>
+          <select id="abs-reason" class="form-control">
+            <option value="مرضي">مرضي</option>
+            <option value="إجازة بدون أذن">إجازة بدون أذن</option>
+            <option value="تأخير متكرر">تأخير متكرر</option>
+            <option value="أسباب شخصية">أسباب شخصية</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-warning">تسجيل الغياب</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal('absence-modal')">إلغاء</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة تسجيل مصروف موظف -->
+  <div id="employee-expense-modal" class="modal">
+    <div class="modal-content">
+      <h3>تسجيل مصروف على الموظف</h3>
+      <form id="employee-expense-form">
+        <div class="form-group">
+          <label>الموظف</label>
+          <select id="exp-emp-id" class="form-control" required></select>
+        </div>
+        <div class="form-group"><label>المبلغ</label><input type="number" id="exp-emp-amount" class="form-control" required></div>
+        <div class="form-group"><label>نوع المصروف</label>
+          <select id="exp-emp-type" class="form-control" required>
+            <option value="أدوات عمل">أدوات عمل</option>
+            <option value="ملابس عمل">ملابس عمل</option>
+            <option value="مواصلات">مواصلات</option>
+            <option value="وجبات">وجبات</option>
+            <option value="مصروف شخصي">مصروف شخصي</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+        </div>
+        <div class="form-group"><label>البيان</label><input type="text" id="exp-emp-desc" class="form-control" placeholder="تفاصيل المصروف"></div>
+        <button type="submit" class="btn btn-info">تسجيل المصروف</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal('employee-expense-modal')">إلغاء</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- النوافذ الأخرى -->
   <div id="edit-sale-modal" class="modal">
     <div class="modal-content">
       <h3>تعديل فاتورة مبيعات</h3>
       <form id="edit-sale-form">
         <input type="hidden" id="edit-sale-id">
-        <div class="form-group">
-          <label>العميل</label>
-          <input type="text" id="edit-sale-customer" class="form-control" required>
-        </div>
-        <div class="form-group">
-          <label>رقم الهاتف</label>
-          <input type="text" id="edit-sale-phone" class="form-control">
-        </div>
+        <div class="form-group"><label>العميل</label><input type="text" id="edit-sale-customer" class="form-control" required></div>
+        <div class="form-group"><label>رقم الهاتف</label><input type="text" id="edit-sale-phone" class="form-control"></div>
         <div class="form-group">
           <label>طريقة الدفع</label>
           <select id="edit-sale-pay-type" class="form-control">
@@ -458,23 +643,17 @@
             <option value="نقدي استلام المالك">مبيعات نقدية استلام المالك مباشرة</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>الخصم</label>
-          <input type="number" id="edit-sale-discount" class="form-control" value="0">
-        </div>
+        <div class="form-group"><label>الخصم</label><input type="number" id="edit-sale-discount" class="form-control" value="0"></div>
         <div style="border:1px solid var(--border-color); border-radius:8px; padding:10px; margin-bottom:10px;">
           <label style="font-weight:600; color:var(--text-muted);">الأصناف:</label>
           <div id="edit-sale-items-container"></div>
         </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button type="submit" class="btn btn-success">تحديث الفاتورة</button>
-          <button type="button" class="btn btn-danger" onclick="closeModal('edit-sale-modal')">إلغاء</button>
-        </div>
+        <button type="submit" class="btn btn-success">تحديث الفاتورة</button>
+        <button type="button" class="btn btn-danger" onclick="closeModal('edit-sale-modal')">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- نوافذ التعديل والإضافة الأخرى -->
   <div id="edit-product-modal" class="modal">
     <div class="modal-content">
       <h3>تعديل بيانات صنف</h3>
@@ -512,20 +691,6 @@
         </div>
         <button type="submit" class="btn btn-success">تحديث</button>
         <button type="button" class="btn btn-danger" onclick="closeModal('edit-purchase-modal')">إلغاء</button>
-      </form>
-    </div>
-  </div>
-
-  <div id="edit-employee-modal" class="modal">
-    <div class="modal-content">
-      <h3>تعديل بيانات موظف</h3>
-      <form id="edit-employee-form">
-        <input type="hidden" id="edit-emp-id">
-        <div class="form-group"><label>اسم العامل</label><input type="text" id="edit-emp-name" class="form-control" required></div>
-        <div class="form-group"><label>تاريخ التعيين</label><input type="date" id="edit-emp-date" class="form-control" required></div>
-        <div class="form-group"><label>الراتب</label><input type="number" id="edit-emp-salary" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">تحديث</button>
-        <button type="button" class="btn btn-danger" onclick="closeModal('edit-employee-modal')">إلغاء</button>
       </form>
     </div>
   </div>
@@ -670,34 +835,6 @@
     </div>
   </div>
 
-  <div id="employee-modal" class="modal">
-    <div class="modal-content">
-      <h3>إضافة موظف جديد</h3>
-      <form id="employee-form">
-        <div class="form-group"><label>اسم العامل</label><input type="text" id="emp-name" class="form-control" required></div>
-        <div class="form-group"><label>تاريخ التعيين</label><input type="date" id="emp-date" class="form-control" required></div>
-        <div class="form-group"><label>الراتب</label><input type="number" id="emp-salary" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">حفظ</button>
-        <button type="button" class="btn btn-danger" onclick="closeModal('employee-modal')">إلغاء</button>
-      </form>
-    </div>
-  </div>
-
-  <div id="advance-modal" class="modal">
-    <div class="modal-content">
-      <h3>تسجيل سلفة موظف</h3>
-      <form id="advance-form">
-        <div class="form-group">
-          <label>الموظف</label>
-          <select id="adv-emp-id" class="form-control" required></select>
-        </div>
-        <div class="form-group"><label>المبلغ</label><input type="number" id="adv-amount" class="form-control" required></div>
-        <button type="submit" class="btn btn-success">تسجيل</button>
-        <button type="button" class="btn btn-danger" onclick="closeModal('advance-modal')">إلغاء</button>
-      </form>
-    </div>
-  </div>
-
   <div id="asset-modal" class="modal">
     <div class="modal-content">
       <h3>تسجيل أصل أو حساب</h3>
@@ -760,7 +897,7 @@
     // محرك البيانات
     // ==========================================================================
     const DB_NAME = 'AbuSaud_ERP_DB';
-    const DB_VERSION = 5;
+    const DB_VERSION = 7;
     let dbInstance = null;
     let currentUser = null;
     let cart = [];
@@ -778,7 +915,7 @@
         req.onsuccess = (e) => { dbInstance = e.target.result; resolve(dbInstance); };
         req.onupgradeneeded = (e) => {
           const db = e.target.result;
-          const stores = ['Users', 'Products', 'Sales', 'Purchases', 'Employees', 'Advances', 'Expenses', 'Assets', 'Transfers', 'AuditLogs'];
+          const stores = ['Users', 'Products', 'Sales', 'Purchases', 'Employees', 'Advances', 'Expenses', 'Assets', 'Transfers', 'AuditLogs', 'EmployeeTransactions'];
           stores.forEach(s => { 
             if (!db.objectStoreNames.contains(s)) {
               db.createObjectStore(s, { keyPath: 'id', autoIncrement: true });
@@ -877,7 +1014,48 @@
     }
 
     // ==========================================================================
-    // المبيعات
+    // حساب الراتب
+    // ==========================================================================
+    function calculateSalary(emp) {
+      const base = emp.salary || 0;
+      const dailyRate = base / 30;
+      
+      const allowances = {
+        transport: emp.transportAllowance || 0,
+        housing: emp.housingAllowance || 0,
+        bonus: emp.bonus || 0,
+        commission: emp.commission || 0,
+        other: emp.otherAllowance || 0
+      };
+      
+      // الخصومات الأساسية (الثابتة في الموظف)
+      const baseDeductions = {
+        insurance: emp.insurance || 0,
+        fixed: emp.fixedDeduction || 0
+      };
+      
+      const totalAllowances = Object.values(allowances).reduce((a, b) => a + b, 0);
+      const totalBaseDeductions = Object.values(baseDeductions).reduce((a, b) => a + b, 0);
+      
+      // الخصومات الإضافية من المعاملات (خصومات، غياب، مصروفات)
+      const extraDeductions = emp.totalExtraDeductions || 0;
+      
+      const netSalary = base + totalAllowances - totalBaseDeductions - extraDeductions;
+      
+      return {
+        base,
+        dailyRate,
+        allowances,
+        totalAllowances,
+        baseDeductions,
+        totalBaseDeductions,
+        extraDeductions,
+        netSalary
+      };
+    }
+
+    // ==========================================================================
+    // المبيعات (مختصر)
     // ==========================================================================
     let isNewSaleMode = false;
 
@@ -994,7 +1172,6 @@
       await DataService.add('Sales', saleData);
       await logAudit('إصدار فاتورة مبيعات', `فاتورة بمبلغ ${total} - العميل: ${customer}`);
 
-      // تحديث المخزون
       for (let item of cart) {
         if (typeof item.id === 'number') {
           const prod = await DataService.getById('Products', item.id);
@@ -1005,7 +1182,6 @@
         }
       }
 
-      // طباعة الفاتورة
       const printArea = document.getElementById('print-area');
       printArea.innerHTML = `
         <div class="thermal-80mm">
@@ -1037,7 +1213,7 @@
     }
 
     // ==========================================================================
-    // عرض المبيعات مع إمكانية التعديل
+    // عرض المبيعات
     // ==========================================================================
     async function renderSales() {
       const list = await DataService.getAll('Sales');
@@ -1100,7 +1276,6 @@
         container.appendChild(div);
       });
       
-      // إضافة مستمعين للتحديث التلقائي
       document.querySelectorAll('.edit-item-qty').forEach(el => {
         el.addEventListener('change', function() {
           const idx = parseInt(this.dataset.index);
@@ -1149,14 +1324,11 @@
       const payType = document.getElementById('edit-sale-pay-type').value;
       const discount = parseFloat(document.getElementById('edit-sale-discount').value) || 0;
       
-      // حساب الإجمالي الجديد
       const total = editCartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
       const finalTotal = Math.max(0, total - discount);
       
-      // الحصول على الفاتورة القديمة لاستعادة المخزون
       const oldSale = await DataService.getById('Sales', id);
       
-      // استعادة المخزون القديم
       if (oldSale && oldSale.items) {
         for (let item of oldSale.items) {
           if (typeof item.id === 'number') {
@@ -1169,7 +1341,6 @@
         }
       }
       
-      // تطبيق المخزون الجديد
       for (let item of editCartItems) {
         if (typeof item.id === 'number') {
           const prod = await DataService.getById('Products', item.id);
@@ -1180,7 +1351,6 @@
         }
       }
       
-      // تحديث الفاتورة
       await DataService.update('Sales', {
         id: id,
         date: oldSale ? oldSale.date : new Date().toLocaleString('ar-EG'),
@@ -1203,9 +1373,6 @@
       alert('تم تحديث الفاتورة بنجاح!');
     });
 
-    // ==========================================================================
-    // حذف الفاتورة
-    // ==========================================================================
     async function deleteSale(id) {
       if (currentUser.role !== 'المدير المالي (الكنترول)') {
         return alert('الحذف متاح فقط للكنترول!');
@@ -1214,7 +1381,6 @@
       
       const sale = await DataService.getById('Sales', id);
       if (sale && sale.items) {
-        // استعادة المخزون
         for (let item of sale.items) {
           if (typeof item.id === 'number') {
             const prod = await DataService.getById('Products', item.id);
@@ -1233,6 +1399,489 @@
     }
 
     // ==========================================================================
+    // وظائف الموظفين
+    // ==========================================================================
+    function openEmployeeModal() { 
+      document.getElementById('employee-modal').classList.add('active'); 
+    }
+
+    document.getElementById('employee-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await DataService.add('Employees', {
+        name: document.getElementById('emp-name').value,
+        date: document.getElementById('emp-date').value,
+        salary: parseFloat(document.getElementById('emp-salary').value) || 0,
+        transportAllowance: 0,
+        housingAllowance: 0,
+        bonus: 0,
+        commission: 0,
+        otherAllowance: 0,
+        insurance: 0,
+        fixedDeduction: 0,
+        totalExtraDeductions: 0
+      });
+      closeModal('employee-modal');
+      document.getElementById('employee-form').reset();
+      renderEmployees();
+      renderEmployeeTransactions();
+    });
+
+    // ==========================================================================
+    // تعديل الموظف
+    // ==========================================================================
+    async function editEmployee(id) {
+      if (currentUser.role !== 'المدير المالي (الكنترول)') {
+        return alert('التعديل متاح فقط للكنترول!');
+      }
+      const item = await DataService.getById('Employees', id);
+      if (!item) return alert('البيانات غير موجودة!');
+      
+      document.getElementById('edit-emp-id').value = item.id;
+      document.getElementById('edit-emp-name').value = item.name;
+      document.getElementById('edit-emp-date').value = item.date;
+      document.getElementById('edit-emp-salary').value = item.salary;
+      
+      document.getElementById('edit-emp-transport').value = item.transportAllowance || 0;
+      document.getElementById('edit-emp-housing').value = item.housingAllowance || 0;
+      document.getElementById('edit-emp-bonus').value = item.bonus || 0;
+      document.getElementById('edit-emp-commission').value = item.commission || 0;
+      document.getElementById('edit-emp-other-allowance').value = item.otherAllowance || 0;
+      
+      document.getElementById('edit-emp-insurance').value = item.insurance || 0;
+      document.getElementById('edit-emp-fixed-deduction').value = item.fixedDeduction || 0;
+      
+      updateEditSalarySummary();
+      
+      document.querySelectorAll('#edit-employee-form input[type="number"]').forEach(input => {
+        input.addEventListener('input', updateEditSalarySummary);
+      });
+      
+      document.getElementById('edit-employee-modal').classList.add('active');
+    }
+
+    function updateEditSalarySummary() {
+      const base = parseFloat(document.getElementById('edit-emp-salary').value) || 0;
+      const transport = parseFloat(document.getElementById('edit-emp-transport').value) || 0;
+      const housing = parseFloat(document.getElementById('edit-emp-housing').value) || 0;
+      const bonus = parseFloat(document.getElementById('edit-emp-bonus').value) || 0;
+      const commission = parseFloat(document.getElementById('edit-emp-commission').value) || 0;
+      const otherAllowance = parseFloat(document.getElementById('edit-emp-other-allowance').value) || 0;
+      
+      const insurance = parseFloat(document.getElementById('edit-emp-insurance').value) || 0;
+      const fixedDeduction = parseFloat(document.getElementById('edit-emp-fixed-deduction').value) || 0;
+      
+      const totalAllowances = transport + housing + bonus + commission + otherAllowance;
+      const totalDeductions = insurance + fixedDeduction;
+      const netSalary = base + totalAllowances - totalDeductions;
+      
+      document.getElementById('edit-total-allowances').innerText = totalAllowances;
+      document.getElementById('edit-total-deductions').innerText = totalDeductions;
+      document.getElementById('edit-net-salary').innerText = netSalary;
+    }
+
+    document.getElementById('edit-employee-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('edit-emp-id').value);
+      
+      // حساب الخصومات الإضافية من المعاملات
+      const transactions = await DataService.getAll('EmployeeTransactions');
+      const empTransactions = transactions.filter(t => t.empId === id);
+      const totalExtraDeductions = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+      
+      await DataService.update('Employees', {
+        id: id,
+        name: document.getElementById('edit-emp-name').value,
+        date: document.getElementById('edit-emp-date').value,
+        salary: parseFloat(document.getElementById('edit-emp-salary').value) || 0,
+        transportAllowance: parseFloat(document.getElementById('edit-emp-transport').value) || 0,
+        housingAllowance: parseFloat(document.getElementById('edit-emp-housing').value) || 0,
+        bonus: parseFloat(document.getElementById('edit-emp-bonus').value) || 0,
+        commission: parseFloat(document.getElementById('edit-emp-commission').value) || 0,
+        otherAllowance: parseFloat(document.getElementById('edit-emp-other-allowance').value) || 0,
+        insurance: parseFloat(document.getElementById('edit-emp-insurance').value) || 0,
+        fixedDeduction: parseFloat(document.getElementById('edit-emp-fixed-deduction').value) || 0,
+        totalExtraDeductions: totalExtraDeductions
+      });
+      
+      closeModal('edit-employee-modal');
+      renderEmployees();
+      await logAudit('تعديل موظف', `تعديل بيانات الموظف: ${document.getElementById('edit-emp-name').value}`);
+    });
+
+    // ==========================================================================
+    // تسجيل سلفة
+    // ==========================================================================
+    async function openAdvanceModal() {
+      const emps = await DataService.getAll('Employees');
+      const sel = document.getElementById('adv-emp-id');
+      sel.innerHTML = emps.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+      document.getElementById('advance-modal').classList.add('active');
+    }
+
+    document.getElementById('advance-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const empId = parseInt(document.getElementById('adv-emp-id').value);
+      const amount = parseFloat(document.getElementById('adv-amount').value);
+      const desc = document.getElementById('adv-desc').value || 'سلفة';
+      
+      const emp = await DataService.getById('Employees', empId);
+      
+      await DataService.add('EmployeeTransactions', {
+        empId: empId,
+        empName: emp ? emp.name : '',
+        type: 'سلفة',
+        amount: amount,
+        desc: desc,
+        date: new Date().toLocaleString('ar-EG')
+      });
+      
+      // تحديث الخصومات الإضافية
+      const transactions = await DataService.getAll('EmployeeTransactions');
+      const empTransactions = transactions.filter(t => t.empId === empId);
+      const totalExtra = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+      
+      if (emp) {
+        emp.totalExtraDeductions = totalExtra;
+        await DataService.update('Employees', emp);
+      }
+      
+      closeModal('advance-modal');
+      document.getElementById('advance-form').reset();
+      renderEmployees();
+      renderEmployeeTransactions();
+      await logAudit('تسجيل سلفة', `سلفة بمبلغ ${amount} للموظف: ${emp ? emp.name : ''}`);
+    });
+
+    // ==========================================================================
+    // تسجيل خصم
+    // ==========================================================================
+    async function openDeductionModal() {
+      const emps = await DataService.getAll('Employees');
+      const sel = document.getElementById('ded-emp-id');
+      sel.innerHTML = emps.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+      document.getElementById('deduction-modal').classList.add('active');
+    }
+
+    document.getElementById('deduction-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const empId = parseInt(document.getElementById('ded-emp-id').value);
+      const amount = parseFloat(document.getElementById('ded-amount').value);
+      const type = document.getElementById('ded-type').value;
+      const desc = document.getElementById('ded-desc').value || type;
+      
+      const emp = await DataService.getById('Employees', empId);
+      
+      await DataService.add('EmployeeTransactions', {
+        empId: empId,
+        empName: emp ? emp.name : '',
+        type: 'خصم',
+        subType: type,
+        amount: amount,
+        desc: desc,
+        date: new Date().toLocaleString('ar-EG')
+      });
+      
+      const transactions = await DataService.getAll('EmployeeTransactions');
+      const empTransactions = transactions.filter(t => t.empId === empId);
+      const totalExtra = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+      
+      if (emp) {
+        emp.totalExtraDeductions = totalExtra;
+        await DataService.update('Employees', emp);
+      }
+      
+      closeModal('deduction-modal');
+      document.getElementById('deduction-form').reset();
+      renderEmployees();
+      renderEmployeeTransactions();
+      await logAudit('تسجيل خصم', `خصم بمبلغ ${amount} للموظف: ${emp ? emp.name : ''}`);
+    });
+
+    // ==========================================================================
+    // تسجيل غياب
+    // ==========================================================================
+    async function openAbsenceModal() {
+      const emps = await DataService.getAll('Employees');
+      const sel = document.getElementById('abs-emp-id');
+      sel.innerHTML = emps.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+      
+      // تحديث قيمة اليومية عند اختيار موظف
+      document.getElementById('abs-emp-id').addEventListener('change', function() {
+        updateAbsenceDailyRate();
+      });
+      
+      document.getElementById('abs-days').addEventListener('input', function() {
+        updateAbsenceTotal();
+      });
+      
+      document.getElementById('absence-modal').classList.add('active');
+      updateAbsenceDailyRate();
+    }
+
+    async function updateAbsenceDailyRate() {
+      const empId = parseInt(document.getElementById('abs-emp-id').value);
+      if (!empId) return;
+      const emp = await DataService.getById('Employees', empId);
+      if (emp) {
+        const dailyRate = (emp.salary || 0) / 30;
+        document.getElementById('abs-daily-rate').value = dailyRate.toFixed(2);
+        updateAbsenceTotal();
+      }
+    }
+
+    function updateAbsenceTotal() {
+      const dailyRate = parseFloat(document.getElementById('abs-daily-rate').value) || 0;
+      const days = parseInt(document.getElementById('abs-days').value) || 0;
+      const total = dailyRate * days;
+      document.getElementById('abs-total').value = total.toFixed(2);
+    }
+
+    document.getElementById('absence-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const empId = parseInt(document.getElementById('abs-emp-id').value);
+      const days = parseInt(document.getElementById('abs-days').value);
+      const reason = document.getElementById('abs-reason').value;
+      const total = parseFloat(document.getElementById('abs-total').value) || 0;
+      
+      const emp = await DataService.getById('Employees', empId);
+      
+      await DataService.add('EmployeeTransactions', {
+        empId: empId,
+        empName: emp ? emp.name : '',
+        type: 'غياب',
+        subType: reason,
+        days: days,
+        amount: total,
+        desc: `غياب ${days} يوم - ${reason}`,
+        date: new Date().toLocaleString('ar-EG')
+      });
+      
+      const transactions = await DataService.getAll('EmployeeTransactions');
+      const empTransactions = transactions.filter(t => t.empId === empId);
+      const totalExtra = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+      
+      if (emp) {
+        emp.totalExtraDeductions = totalExtra;
+        await DataService.update('Employees', emp);
+      }
+      
+      closeModal('absence-modal');
+      document.getElementById('absence-form').reset();
+      renderEmployees();
+      renderEmployeeTransactions();
+      await logAudit('تسجيل غياب', `غياب ${days} يوم للموظف: ${emp ? emp.name : ''}`);
+    });
+
+    // ==========================================================================
+    // تسجيل مصروف موظف
+    // ==========================================================================
+    async function openEmployeeExpenseModal() {
+      const emps = await DataService.getAll('Employees');
+      const sel = document.getElementById('exp-emp-id');
+      sel.innerHTML = emps.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+      document.getElementById('employee-expense-modal').classList.add('active');
+    }
+
+    document.getElementById('employee-expense-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const empId = parseInt(document.getElementById('exp-emp-id').value);
+      const amount = parseFloat(document.getElementById('exp-emp-amount').value);
+      const type = document.getElementById('exp-emp-type').value;
+      const desc = document.getElementById('exp-emp-desc').value || type;
+      
+      const emp = await DataService.getById('Employees', empId);
+      
+      await DataService.add('EmployeeTransactions', {
+        empId: empId,
+        empName: emp ? emp.name : '',
+        type: 'مصروف',
+        subType: type,
+        amount: amount,
+        desc: desc,
+        date: new Date().toLocaleString('ar-EG')
+      });
+      
+      const transactions = await DataService.getAll('EmployeeTransactions');
+      const empTransactions = transactions.filter(t => t.empId === empId);
+      const totalExtra = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+      
+      if (emp) {
+        emp.totalExtraDeductions = totalExtra;
+        await DataService.update('Employees', emp);
+      }
+      
+      closeModal('employee-expense-modal');
+      document.getElementById('employee-expense-form').reset();
+      renderEmployees();
+      renderEmployeeTransactions();
+      await logAudit('تسجيل مصروف موظف', `مصروف بمبلغ ${amount} للموظف: ${emp ? emp.name : ''}`);
+    });
+
+    // ==========================================================================
+    // عرض الموظفين
+    // ==========================================================================
+    async function renderEmployees() {
+      const emps = await DataService.getAll('Employees');
+      document.getElementById('employees-table-body').innerHTML = emps.map((e, index) => {
+        const salary = calculateSalary(e);
+        return `<tr>
+          <td>${index + 1}</td>
+          <td>${e.name}</td>
+          <td>${e.date}</td>
+          <td>${salary.base} ج.م</td>
+          <td>${salary.dailyRate.toFixed(2)} ج.م</td>
+          <td>${salary.totalAllowances} ج.م</td>
+          <td style="color:var(--danger-color);">${salary.totalBaseDeductions + salary.extraDeductions} ج.م</td>
+          <td style="font-weight:bold; color:var(--accent-color);">${salary.netSalary.toFixed(2)} ج.م</td>
+          <td>
+            <button class="btn btn-warning" onclick="editEmployee(${e.id})">تعديل</button>
+            <button class="btn btn-danger" onclick="deleteEmployee(${e.id})">حذف</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ==========================================================================
+    // عرض معاملات الموظفين (سجل الخصومات والغياب والمصروفات)
+    // ==========================================================================
+    async function renderEmployeeTransactions() {
+      const transactions = await DataService.getAll('EmployeeTransactions');
+      document.getElementById('employee-transactions-body').innerHTML = transactions.reverse().map(t => {
+        let badgeClass = 'badge-info';
+        if (t.type === 'خصم') badgeClass = 'badge-danger';
+        else if (t.type === 'سلفة') badgeClass = 'badge-warning';
+        else if (t.type === 'غياب') badgeClass = 'badge-info';
+        else if (t.type === 'مصروف') badgeClass = 'badge-secondary';
+        
+        return `<tr>
+          <td>${t.date}</td>
+          <td>${t.empName}</td>
+          <td><span class="badge ${badgeClass}">${t.type}${t.subType ? ' - ' + t.subType : ''}</span></td>
+          <td style="color:var(--danger-color);">${t.amount || 0} ج.م${t.days ? ' (${t.days} يوم)' : ''}</td>
+          <td>${t.desc || ''}</td>
+          <td><button class="btn btn-danger" onclick="deleteEmployeeTransaction(${t.id})">حذف</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ==========================================================================
+    // حذف معاملة موظف
+    // ==========================================================================
+    async function deleteEmployeeTransaction(id) {
+      if (currentUser.role !== 'المدير المالي (الكنترول)') {
+        return alert('الحذف متاح فقط للكنترول!');
+      }
+      if (!confirm('هل أنت متأكد من حذف هذه المعاملة؟')) return;
+      
+      const trans = await DataService.getById('EmployeeTransactions', id);
+      await DataService.delete('EmployeeTransactions', id);
+      
+      // تحديث الخصومات الإضافية للموظف
+      if (trans) {
+        const transactions = await DataService.getAll('EmployeeTransactions');
+        const empTransactions = transactions.filter(t => t.empId === trans.empId);
+        const totalExtra = empTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+        
+        const emp = await DataService.getById('Employees', trans.empId);
+        if (emp) {
+          emp.totalExtraDeductions = totalExtra;
+          await DataService.update('Employees', emp);
+        }
+      }
+      
+      renderEmployees();
+      renderEmployeeTransactions();
+      await logAudit('حذف معاملة موظف', `حذف معاملة #${id}`);
+    }
+
+    // ==========================================================================
+    // حذف موظف
+    // ==========================================================================
+    async function deleteEmployee(id) {
+      if (currentUser.role !== 'المدير المالي (الكنترول)') {
+        return alert('الحذف متاح فقط للكنترول!');
+      }
+      if (!confirm('هل أنت متأكد من حذف هذا الموظف؟')) return;
+      
+      // حذف معاملات الموظف
+      const transactions = await DataService.getAll('EmployeeTransactions');
+      for (let t of transactions) {
+        if (t.empId === id) {
+          await DataService.delete('EmployeeTransactions', t.id);
+        }
+      }
+      
+      await DataService.delete('Employees', id);
+      renderEmployees();
+      renderEmployeeTransactions();
+      await logAudit('حذف موظف', `حذف موظف رقم #${id}`);
+    }
+
+    // ==========================================================================
+    // طباعة تقرير الموظفين
+    // ==========================================================================
+    async function printEmployeesReport() {
+      const emps = await DataService.getAll('Employees');
+      if (emps.length === 0) {
+        return alert('لا يوجد موظفين لعرض تقرير عنهم!');
+      }
+      
+      let tableRows = emps.map((e, index) => {
+        const salary = calculateSalary(e);
+        return `<tr>
+          <td>${index + 1}</td>
+          <td>${e.name}</td>
+          <td>${e.date}</td>
+          <td>${salary.base}</td>
+          <td>${salary.dailyRate.toFixed(2)}</td>
+          <td>${salary.totalAllowances}</td>
+          <td>${salary.totalBaseDeductions + salary.extraDeductions}</td>
+          <td><strong>${salary.netSalary.toFixed(2)}</strong></td>
+        </tr>`;
+      }).join('');
+      
+      const totalSalaries = emps.reduce((sum, e) => sum + calculateSalary(e).netSalary, 0);
+      
+      const printArea = document.getElementById('print-area');
+      printArea.innerHTML = `
+        <div class="print-report">
+          <div class="header">
+            <h1>أبو السعود علام</h1>
+            <h2>تقرير الرواتب والأجور</h2>
+            <p>التاريخ: ${new Date().toLocaleString('ar-EG')}</p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>اسم العامل</th>
+                <th>تاريخ التعيين</th>
+                <th>الراتب الأساسي</th>
+                <th>اليومية</th>
+                <th>البدلات</th>
+                <th>الخصومات</th>
+                <th>صافي الراتب</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="7" style="text-align:left;">إجمالي الرواتب</td>
+                <td>${totalSalaries.toFixed(2)} ج.م</td>
+              </tr>
+            </tfoot>
+          </table>
+          <div style="margin-top:20px; text-align:center; font-size:12px; color:#666;">
+            تم إنشاء هذا التقرير بواسطة: ${currentUser.username}
+          </div>
+        </div>
+      `;
+      window.print();
+    }
+
+    // ==========================================================================
     // الإضافة والتعديل الأخرى
     // ==========================================================================
     function openProductModal() { 
@@ -1244,19 +1893,11 @@
     function openPurchaseModal() { document.getElementById('purchase-modal').classList.add('active'); }
     function openTransferModal() { document.getElementById('transfer-modal').classList.add('active'); }
     function openExpenseModal() { document.getElementById('expense-modal').classList.add('active'); }
-    function openEmployeeModal() { document.getElementById('employee-modal').classList.add('active'); }
     function openAssetModal() { document.getElementById('asset-modal').classList.add('active'); }
     function openUserModal() { document.getElementById('user-modal').classList.add('active'); }
     
     function closeModal(id) { 
       document.getElementById(id).classList.remove('active'); 
-    }
-
-    async function openAdvanceModal() {
-      const emps = await DataService.getAll('Employees');
-      const sel = document.getElementById('adv-emp-id');
-      sel.innerHTML = emps.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
-      document.getElementById('advance-modal').classList.add('active');
     }
 
     // نماذج الإضافة
@@ -1314,30 +1955,6 @@
       closeModal('expense-modal');
       document.getElementById('expense-form').reset();
       renderExpenses();
-    });
-
-    document.getElementById('employee-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await DataService.add('Employees', {
-        name: document.getElementById('emp-name').value,
-        date: document.getElementById('emp-date').value,
-        salary: parseFloat(document.getElementById('emp-salary').value)
-      });
-      closeModal('employee-modal');
-      document.getElementById('employee-form').reset();
-      renderEmployees();
-    });
-
-    document.getElementById('advance-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await DataService.add('Advances', {
-        empId: parseInt(document.getElementById('adv-emp-id').value),
-        amount: parseFloat(document.getElementById('adv-amount').value),
-        date: new Date().toLocaleString('ar-EG')
-      });
-      closeModal('advance-modal');
-      document.getElementById('advance-form').reset();
-      renderEmployees();
     });
 
     document.getElementById('asset-form').addEventListener('submit', async (e) => {
@@ -1428,32 +2045,6 @@
       });
       closeModal('edit-purchase-modal');
       renderPurchases();
-    });
-
-    async function editEmployee(id) {
-      if (currentUser.role !== 'المدير المالي (الكنترول)') {
-        return alert('التعديل متاح فقط للكنترول!');
-      }
-      const item = await DataService.getById('Employees', id);
-      if (!item) return alert('البيانات غير موجودة!');
-      document.getElementById('edit-emp-id').value = item.id;
-      document.getElementById('edit-emp-name').value = item.name;
-      document.getElementById('edit-emp-date').value = item.date;
-      document.getElementById('edit-emp-salary').value = item.salary;
-      document.getElementById('edit-employee-modal').classList.add('active');
-    }
-
-    document.getElementById('edit-employee-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = parseInt(document.getElementById('edit-emp-id').value);
-      await DataService.update('Employees', {
-        id,
-        name: document.getElementById('edit-emp-name').value,
-        date: document.getElementById('edit-emp-date').value,
-        salary: parseFloat(document.getElementById('edit-emp-salary').value)
-      });
-      closeModal('edit-employee-modal');
-      renderEmployees();
     });
 
     async function editExpense(id) {
@@ -1548,25 +2139,6 @@
       `).join('');
     }
 
-    async function renderEmployees() {
-      const emps = await DataService.getAll('Employees');
-      const advs = await DataService.getAll('Advances');
-      document.getElementById('employees-table-body').innerHTML = emps.map(e => {
-        const totalAdv = advs.filter(a => a.empId === e.id).reduce((s, a) => s + a.amount, 0);
-        return `<tr>
-          <td>${e.name}</td>
-          <td>${e.date}</td>
-          <td>${e.salary}</td>
-          <td>${totalAdv}</td>
-          <td>${e.salary - totalAdv}</td>
-          <td>
-            <button class="btn btn-warning" onclick="editEmployee(${e.id})">تعديل</button>
-            <button class="btn btn-danger" onclick="deleteItem('Employees', ${e.id})">حذف</button>
-          </td>
-        </tr>`;
-      }).join('');
-    }
-
     async function renderExpenses() {
       const list = await DataService.getAll('Expenses');
       document.getElementById('expenses-table-body').innerHTML = list.map(x => `
@@ -1622,7 +2194,6 @@
         const map = {
           'Products': renderInventory,
           'Purchases': renderPurchases,
-          'Employees': renderEmployees,
           'Expenses': renderExpenses,
           'Assets': renderAssets
         };
@@ -1634,12 +2205,17 @@
     async function renderDashboard() {
       const sales = await DataService.getAll('Sales');
       const expenses = await DataService.getAll('Expenses');
+      const employees = await DataService.getAll('Employees');
+      
       const totalS = sales.reduce((s, x) => s + (x.total || 0), 0);
       const totalE = expenses.reduce((s, x) => s + (x.amount || 0), 0);
+      const totalSalaries = employees.reduce((s, e) => s + calculateSalary(e).netSalary, 0);
+      
       document.getElementById('dash-cards').innerHTML = `
         <div class="card"><h4>إجمالي المبيعات</h4><div class="value gold">${totalS} ج.م</div></div>
         <div class="card"><h4>إجمالي المصروفات</h4><div class="value">${totalE} ج.م</div></div>
-        <div class="card"><h4>صافي الأرباح</h4><div class="value gold">${totalS - totalE} ج.م</div></div>
+        <div class="card"><h4>إجمالي الرواتب</h4><div class="value">${totalSalaries.toFixed(2)} ج.م</div></div>
+        <div class="card"><h4>صافي الأرباح</h4><div class="value gold">${(totalS - totalE - totalSalaries).toFixed(2)} ج.م</div></div>
       `;
     }
 
@@ -1647,10 +2223,20 @@
     // Excel
     // ==========================================================================
     async function exportToExcelBackup() {
-      const stores = ['Sales', 'Purchases', 'Products', 'Expenses', 'Employees', 'Assets', 'AuditLogs'];
+      const stores = ['Sales', 'Purchases', 'Products', 'Expenses', 'Employees', 'Assets', 'AuditLogs', 'EmployeeTransactions'];
       const wb = XLSX.utils.book_new();
       for (let s of stores) {
         const data = await DataService.getAll(s);
+        if (s === 'Employees') {
+          data.forEach(e => {
+            const salary = calculateSalary(e);
+            e.totalAllowances = salary.totalAllowances;
+            e.totalBaseDeductions = salary.totalBaseDeductions;
+            e.extraDeductions = salary.extraDeductions;
+            e.netSalary = salary.netSalary;
+            e.dailyRate = salary.dailyRate;
+          });
+        }
         const ws = XLSX.utils.json_to_sheet(data);
         XLSX.utils.book_append_sheet(wb, ws, s);
       }
@@ -1714,7 +2300,10 @@
         }
         if (target === 'purchases') renderPurchases();
         if (target === 'inventory') renderInventory();
-        if (target === 'employees') renderEmployees();
+        if (target === 'employees') {
+          renderEmployees();
+          renderEmployeeTransactions();
+        }
         if (target === 'expenses') renderExpenses();
         if (target === 'assets') renderAssets();
         if (target === 'users') renderUsers();
